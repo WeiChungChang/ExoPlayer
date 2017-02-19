@@ -366,6 +366,11 @@ public class MediaCodecAudioRenderer extends MediaCodecRenderer implements Media
   }
 
   @Override
+  public void setPlaybackSpeed(float speed) {
+    audioTrack.setPlaybackSpeed(speed);
+  }
+
+  @Override
   public void handleMessage(int messageType, Object message) throws ExoPlaybackException {
     switch (messageType) {
       case C.MSG_SET_VOLUME:

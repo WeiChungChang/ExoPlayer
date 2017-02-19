@@ -1036,4 +1036,14 @@ public class SimpleExoPlayer implements ExoPlayer {
 
   }
 
+  @Override
+  public float getPlaybackSpeed() {
+    return player.getPlaybackSpeed();
+  }
+
+  @Override
+  public void setPlaybackSpeed(float speed) {
+    player.setPlaybackSpeed(speed);
+  }
+
 }

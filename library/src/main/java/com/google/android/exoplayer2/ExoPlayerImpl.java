@@ -313,6 +313,16 @@ import java.util.concurrent.CopyOnWriteArraySet;
   }
 
   @Override
+  public float getPlaybackSpeed() { 
+    return internalPlayer.getPlaybackSpeed();
+  }
+
+  @Override
+  public void setPlaybackSpeed(float speed) { 
+    internalPlayer.setPlaybackSpeed(speed);
+  }
+
+  @Override
   public Object getCurrentManifest() {
     return manifest;
   }
