@@ -237,7 +237,7 @@ public class AdaptiveVideoTrackSelection extends BaseTrackSelection {
     for (int i = 0; i < length; i++) {
       if (nowMs == Long.MIN_VALUE || !isBlacklisted(i, nowMs)) {
         Format format = getFormat(i);
-        if (format.bitrate <= effectiveBitrate) {
+        if ((format.bitrate * format.speed) <= effectiveBitrate) {
           return i;
         } else {
           lowestBitrateNonBlacklistedIndex = i;

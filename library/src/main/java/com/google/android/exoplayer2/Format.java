@@ -188,6 +188,11 @@ public final class Format implements Parcelable {
 
   // Video.
 
+  /**
+   * For trickPlayBack case.
+   */
+  public float speed;
+
   public static Format createVideoContainerFormat(String id, String containerMimeType,
       String sampleMimeType, String codecs, int bitrate, int width, int height,
       float frameRate, List<byte[]> initializationData, @C.SelectionFlags int selectionFlags) {
@@ -377,6 +382,8 @@ public final class Format implements Parcelable {
         : initializationData;
     this.drmInitData = drmInitData;
     this.metadata = metadata;
+
+    this.speed = 1;
   }
 
   @SuppressWarnings("ResourceType")

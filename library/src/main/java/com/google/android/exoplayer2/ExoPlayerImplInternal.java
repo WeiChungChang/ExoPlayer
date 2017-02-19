@@ -39,6 +39,10 @@ import java.io.IOException;
 
 import android.os.Build;
 import android.media.PlaybackParams;
+
+import com.google.android.exoplayer2.source.TrackGroupArray;
+import com.google.android.exoplayer2.source.TrackGroup;
+
 /**
  * Implements the internal behavior of {@link ExoPlayerImpl}.
  */
@@ -168,6 +172,7 @@ import android.media.PlaybackParams;
 
   private Timeline timeline;
   private float speed;
+  private boolean pendingFormatSpeed;
 
   public ExoPlayerImplInternal(Renderer[] renderers, TrackSelector trackSelector,
       LoadControl loadControl, boolean playWhenReady, Handler eventHandler,
@@ -180,6 +185,9 @@ import android.media.PlaybackParams;
     this.state = ExoPlayer.STATE_IDLE;
     this.playbackInfo = playbackInfo;
     this.player = player;
+
+    this.pendingFormatSpeed = false;
+    this.speed = 1;
 
     rendererCapabilities = new RendererCapabilities[renderers.length];
     for (int i = 0; i < renderers.length; i++) {
@@ -1355,6 +1363,10 @@ import android.media.PlaybackParams;
     }
 
     playingPeriodHolder = periodHolder;
+    if (pendingFormatSpeed) {
+      setFormatSpeed(speed);
+      pendingFormatSpeed = false;
+    }
     eventHandler.obtainMessage(MSG_TRACKS_CHANGED, periodHolder.trackSelectorResult).sendToTarget();
     enableRenderers(rendererWasEnabledFlags, enabledRendererCount);
   }
@@ -1428,11 +1440,34 @@ import android.media.PlaybackParams;
         rendererMediaClock.setPlaybackSpeed(speed);
       }
     }
+    if (playingPeriodHolder != null) {
+      setFormatSpeed(speed);
+    } else {
+      pendingFormatSpeed = true;
+    }
   }
 
   private void maybeUpdatePlaybackSpeed(ExoPlayerMessage msg) {
     if (Build.VERSION.SDK_INT >= 23 && msg.messageType == C.MSG_SET_PLAYBACK_PARAMS) {
       standaloneMediaClock.setPlaybackSpeed(((PlaybackParams)msg.message).allowDefaults().getSpeed());
+    }
+  }
+
+  private void setFormatSpeed(float speed) {
+    Assertions.checkNotNull(playingPeriodHolder);
+	TrackGroupArray rendererTrackGroups = playingPeriodHolder.mediaPeriod.getTrackGroups();
+    if (rendererTrackGroups.length > 0) {
+      for (int groupIndex = 0; groupIndex < rendererTrackGroups.length; groupIndex++) {
+        TrackGroup trackGroup = rendererTrackGroups.get(groupIndex);
+        if (trackGroup != null) {
+          for (int trackIndex = 0; trackIndex < trackGroup.length; trackIndex++) {
+            Format format = trackGroup.getFormat(trackIndex);
+            if (format != null) {
+              format.speed = speed;
+            }
+          }
+        }
+      }
     }
   }
 
