@@ -195,6 +195,28 @@ import java.util.concurrent.CopyOnWriteArraySet;
       }
     }
   }
+  @Override
+  public void seekWithDelay(long positionMs, long delayMs) {
+    seekToWithDelay(getCurrentWindowIndex(), positionMs, delayMs);
+  }
+
+  public void seekToWithDelay(int windowIndex, long positionMs, long delayMs) {
+    if (windowIndex < 0 || (!timeline.isEmpty() && windowIndex >= timeline.getWindowCount())) {
+      throw new IllegalSeekPositionException(timeline, windowIndex, positionMs);
+    }
+    pendingSeekAcks++;
+    maskingWindowIndex = windowIndex;
+    if (positionMs == C.TIME_UNSET) {
+      maskingWindowPositionMs = 0;
+      internalPlayer.seekToWithDelay(timeline, windowIndex, C.TIME_UNSET, delayMs);
+    } else {
+      maskingWindowPositionMs = positionMs;
+     internalPlayer.seekToWithDelay(timeline, windowIndex, C.msToUs(positionMs), delayMs);
+      for (EventListener listener : listeners) {
+        listener.onPositionDiscontinuity();
+      }
+    }
+  }
 
   @Override
   public void stop() {

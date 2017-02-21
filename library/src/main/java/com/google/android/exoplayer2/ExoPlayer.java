@@ -344,6 +344,9 @@ public interface ExoPlayer {
    */
   void seekTo(int windowIndex, long positionMs);
 
+  /*TODO: add commmets later*/
+  void seekWithDelay(long positionMs, long delayMs);
+
   /**
    * Stops playback. Use {@code setPlayWhenReady(false)} rather than this method if the intention
    * is to pause playback.

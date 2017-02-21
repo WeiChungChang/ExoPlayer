@@ -59,6 +59,10 @@ import java.util.regex.Pattern;
  */
 public final class Util {
 
+  public static final boolean TRICK_PLAY_TEST_HACK = false;
+  public static final boolean TRICK_PLAY_HIGH_SPEED = true;
+  public static final long  TRICK_PLAY_DISPLAY_TIME_MS = 500; /*ms*/
+  public static final long MAX_NATIVE_SUPPORT_SPEED = 4;
   /**
    * Like {@link android.os.Build.VERSION#SDK_INT}, but in a place where it can be conveniently
    * overridden for local testing.
@@ -102,6 +106,13 @@ public final class Util {
   private static final Pattern ESCAPED_CHARACTER_PATTERN = Pattern.compile("%([A-Fa-f0-9]{2})");
 
   private Util() {}
+
+  public static boolean isHighSpeed(float speed) {
+    if (((speed > MAX_NATIVE_SUPPORT_SPEED) || (speed < 0))) {
+      return true;
+    }
+    return false;
+  }
 
   /**
    * Converts the entirety of an {@link InputStream} to a byte array.

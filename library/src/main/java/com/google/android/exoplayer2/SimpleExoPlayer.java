@@ -51,6 +51,9 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.android.exoplayer2.util.Util;
+import com.google.android.exoplayer2.util.StandaloneMediaClock;
+
 /**
  * An {@link ExoPlayer} implementation that uses default {@link Renderer} components. Instances can
  * be obtained from {@link ExoPlayerFactory}.
@@ -147,6 +150,9 @@ public class SimpleExoPlayer implements ExoPlayer {
   private float audioVolume;
   private PlaybackParamsHolder playbackParamsHolder;
 
+  boolean trickPlayBySeek;
+  private final StandaloneMediaClock standaloneMediaClock;
+  private float speed;
   protected SimpleExoPlayer(Context context, TrackSelector trackSelector, LoadControl loadControl,
       DrmSessionManager<FrameworkMediaCrypto> drmSessionManager,
       @ExtensionRendererMode int extensionRendererMode, long allowedVideoJoiningTimeMs) {
@@ -183,6 +189,9 @@ public class SimpleExoPlayer implements ExoPlayer {
 
     // Build the player and associated objects.
     player = new ExoPlayerImpl(renderers, trackSelector, loadControl);
+    standaloneMediaClock = new StandaloneMediaClock();
+    this.speed = 1;
+    trickPlayBySeek = false;
   }
 
   /**
@@ -486,6 +495,9 @@ public class SimpleExoPlayer implements ExoPlayer {
 
   @Override
   public void setPlayWhenReady(boolean playWhenReady) {
+    if (!getPlayWhenReady() && speed != 1 && playWhenReady) {
+      setPlaybackSpeed(1);
+    }
     player.setPlayWhenReady(playWhenReady);
   }
 
@@ -500,6 +512,12 @@ public class SimpleExoPlayer implements ExoPlayer {
   }
 
   @Override
+  public void seekWithDelay(long positionMs, long delayMs) {
+
+    player.seekWithDelay(positionMs, delayMs);
+  }
+
+  @Override
   public void seekToDefaultPosition() {
     player.seekToDefaultPosition();
   }
@@ -511,11 +529,21 @@ public class SimpleExoPlayer implements ExoPlayer {
 
   @Override
   public void seekTo(long positionMs) {
+
+    if (Util.isHighSpeed(speed)) {
+      standaloneMediaClock.setPositionUs(positionMs * 1000);
+    }
     player.seekTo(positionMs);
   }
 
   @Override
   public void seekTo(int windowIndex, long positionMs) {
+
+    if (Util.isHighSpeed(speed)) {
+      standaloneMediaClock.stop();
+      standaloneMediaClock.setPositionUs(positionMs * 1000);
+      standaloneMediaClock.start();
+    }
     player.seekTo(windowIndex, positionMs);
   }
 
@@ -893,6 +921,25 @@ public class SimpleExoPlayer implements ExoPlayer {
       }
     }
 
+    private long getNextPositionMs() {
+      long currentPositionUs = standaloneMediaClock.getPositionUs();
+      long nextPositionUs = ((currentPositionUs / 1000) + ((long)speed * Util.TRICK_PLAY_DISPLAY_TIME_MS)); /*in ms*/
+      if (speed > 0) {
+        if (nextPositionUs > (getDuration())) {
+          trickPlayBySeek = false;
+          seekWithDelay(getDuration()/*in ms*/, 0);
+          return C.TIME_END_OF_SOURCE;
+        }
+      } else {
+        if (nextPositionUs < 0) {
+          trickPlayBySeek = false;
+          seekWithDelay(0, 0);
+          return C.TIME_END_OF_SOURCE;
+        }
+      }
+      return nextPositionUs; /*in ms*/
+    }
+
     @Override
     public void onRenderedFirstFrame(Surface surface) {
       if (videoListener != null && SimpleExoPlayer.this.surface == surface) {
@@ -900,6 +947,13 @@ public class SimpleExoPlayer implements ExoPlayer {
       }
       if (videoDebugListener != null) {
         videoDebugListener.onRenderedFirstFrame(surface);
+      }
+      if (trickPlayBySeek) {
+        /*issue next seek*/
+        long nextPosition = getNextPositionMs(); 
+        if (nextPosition != C.TIME_END_OF_SOURCE) {
+          seekWithDelay(nextPosition, Util.TRICK_PLAY_DISPLAY_TIME_MS);
+        }
       }
     }
 
@@ -1043,6 +1097,21 @@ public class SimpleExoPlayer implements ExoPlayer {
 
   @Override
   public void setPlaybackSpeed(float speed) {
+    this.speed = speed;
+
+    if (videoDecoderCounters != null && Util.isHighSpeed(speed)) {
+      standaloneMediaClock.start();
+      long currentPositionMs = getCurrentPosition();
+      standaloneMediaClock.setPositionUs(currentPositionMs * 1000);
+      standaloneMediaClock.setPlaybackSpeed(speed);
+
+      setPlayWhenReady(false);
+      seekWithDelay(currentPositionMs, 0);
+      trickPlayBySeek = true;
+    } else {
+      trickPlayBySeek = false;
+      setPlayWhenReady(true);
+    }
     player.setPlaybackSpeed(speed);
   }
 

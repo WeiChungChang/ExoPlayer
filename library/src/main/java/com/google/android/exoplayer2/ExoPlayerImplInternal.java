@@ -39,7 +39,7 @@ import java.io.IOException;
 
 import android.os.Build;
 import android.media.PlaybackParams;
-
+import com.google.android.exoplayer2.util.Util;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.source.TrackGroup;
 
@@ -218,8 +218,21 @@ import com.google.android.exoplayer2.source.TrackGroup;
   }
 
   public void seekTo(Timeline timeline, int windowIndex, long positionUs) {
+    if (Util.isHighSpeed(speed)) {
+      handler.removeMessages(MSG_SEEK_TO);
+    }
     handler.obtainMessage(MSG_SEEK_TO, new SeekPosition(timeline, windowIndex, positionUs))
         .sendToTarget();
+  }
+
+  public void seekToWithDelay(Timeline timeline, int windowIndex, long positionUs, long delay) {
+    if (delay == 0) {
+      handler.obtainMessage(MSG_SEEK_TO, new SeekPosition(timeline, windowIndex, positionUs))
+          .sendToTarget();
+      return;
+    }
+    Message message = handler.obtainMessage(MSG_SEEK_TO, new SeekPosition(timeline, windowIndex, positionUs));
+    handler.sendMessageDelayed(message, (delay));
   }
 
   public void stop() {
@@ -1420,30 +1433,33 @@ import com.google.android.exoplayer2.source.TrackGroup;
 
   public void setPlaybackSpeed(float speed) {
     this.speed = speed;
-
-    if ((Build.VERSION.SDK_INT >= 23) && (rendererMediaClockSource != null)) {
-      PlaybackParams params = new PlaybackParams();
-      params.setSpeed(speed);
-      ExoPlayerMessage[] messages = new ExoPlayerMessage[renderers.length];
-      for (int i = 0; i < renderers.length; i++) {
-        messages[i] = new ExoPlayerMessage(renderers[i], C.MSG_SET_PLAYBACK_PARAMS, params);
-      }
-      try {
-        sendMessagesInternal(messages);
-      } catch (ExoPlaybackException e) {
-        e.printStackTrace();
-      }
+    if (Util.isHighSpeed(speed)/*in this mode, we operate by seek*/) {
+      return;
     } else {
-      this.speed = speed;
-      standaloneMediaClock.setPlaybackSpeed(speed);
-      if (rendererMediaClock != null) {
-        rendererMediaClock.setPlaybackSpeed(speed);
+      if ((Build.VERSION.SDK_INT >= 23) && (rendererMediaClockSource != null)) {
+        PlaybackParams params = new PlaybackParams();
+        params.setSpeed(speed);
+        ExoPlayerMessage[] messages = new ExoPlayerMessage[renderers.length];
+        for (int i = 0; i < renderers.length; i++) {
+          messages[i] = new ExoPlayerMessage(renderers[i], C.MSG_SET_PLAYBACK_PARAMS, params);
+        }
+        try {
+          sendMessagesInternal(messages);
+        } catch (ExoPlaybackException e) {
+          e.printStackTrace();
+        }
+      } else {
+        this.speed = speed;
+        standaloneMediaClock.setPlaybackSpeed(speed);
+        if (rendererMediaClock != null) {
+          rendererMediaClock.setPlaybackSpeed(speed);
+        }
       }
-    }
-    if (playingPeriodHolder != null) {
-      setFormatSpeed(speed);
-    } else {
-      pendingFormatSpeed = true;
+      if (playingPeriodHolder != null) {
+        setFormatSpeed(speed);
+      } else {
+        pendingFormatSpeed = true;
+      }
     }
   }
 
