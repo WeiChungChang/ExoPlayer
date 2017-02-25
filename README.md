@@ -6,21 +6,18 @@ Per the [request][] of change playback rate (so called trick playback), here a t
 
 ## Progress ##
 
-1. [ Feb 19, 2017]: Provide the patch for trick playback when playing adaptive streaming content; as https://github.com/WeiChungChang/ExoPlayer/commit/5f441187588aa9f5b2b16934bd7fce356155c839 
+1. [ Feb 19, 2017]: Provide the patch for trick playback when playing adaptive streaming content; as: https://github.com/WeiChungChang/ExoPlayer/commit/5f441187588aa9f5b2b16934bd7fce356155c839 
 2. [Feb 21, 2017]: Propose the gereral solution for high speed & reverse playback funcationality;
-as https://github.com/WeiChungChang/ExoPlayer/commit/922529fd1d80ea51dc7bf0938a4960eb2708068c
+as: https://github.com/WeiChungChang/ExoPlayer/commit/922529fd1d80ea51dc7bf0938a4960eb2708068c
 3. Provide a clearer UI to set playback speed.
-as https://github.com/WeiChungChang/ExoPlayer/commit/938d8e415dfea0a6ee9ff97a4ae98e6720ed4514
-
-[click on this link](#my-multi-word-header)
-
+as: https://github.com/WeiChungChang/ExoPlayer/commit/938d8e415dfea0a6ee9ff97a4ae98e6720ed4514
 
 ## Development history ##
-[Progress item 1: Feb 19, 2017](#Progress-item-1)
-[Progress item 2: Feb 21, 2017](#Progress-item-2)
-[Progress item 3: Feb 25, 2017](#Progress-item-3)
+[Provide the patch for trick playback when playing adaptive streaming content](#item1)
+[Propose the gereral solution for high speed & reverse playback funcationality](#item2)
+[Provide a clearer UI to set playback speed](#item3)
 
-### Progress-item-1
+<h2 id="item1">Provide the patch for trick playback when playing adaptive streaming content</h2>
 
 Besides setting speed, **I think we should inform the track selection (AdaptiveVideoTrackSelection) also for adaptive streaming case.** **Otherwise, it may lead to rebuffering by wrongly (over) estimated bit-rate.**
 
@@ -61,7 +58,7 @@ Also, I make a test on my fork at:
 https://github.com/WeiChungChang/ExoPlayer/tree/trickPlayBack
 Please refer to it.
 
-### Progress-item-2
+<h2 id="item1">Propose the gereral solution for high speed & reverse playback funcationality</h2>
 
 
 # Root cause:
@@ -140,9 +137,7 @@ I think it is one of the reasons why iOS could provide much better operation exp
 
 At next step, I will include the design for streaming.
 
-
-
-### Progress-item-3
+<h2 id="item3">Provide a clearer UI to set playback speed</h2>
 
 _**In fact, the patch posted within**_ #https://github.com/WeiChungChang/ExoPlayer/commit/922529fd1d80ea51dc7bf0938a4960eb2708068c
 
@@ -156,19 +151,18 @@ The original files are on YouTube:
 1. https://www.youtube.com/watch?v=ssY8K2wcxpE
 2. https://www.youtube.com/watch?v=wEFx6ly86Jo 
 
-and could be accessed at
-1. https://drive.google.com/open?id=0B7H5vJR3qWj0WjFjclQ5T09GRnM
-2. https://drive.google.com/open?id=0B7H5vJR3qWj0MWwwVnRFaXNITGc
+and could be accessed at:
+1.https://drive.google.com/open?id=0B7H5vJR3qWj0WjFjclQ5T09GRnM
+2.https://drive.google.com/open?id=0B7H5vJR3qWj0MWwwVnRFaXNITGc
 
 **_Simply make the flow tries to DO AS BEST AS IT COULD, as below:_**
 `public static final long  TRICK_PLAY_DISPLAY_TIME_MS = 0; /*ms, original it is set to 500*/`
 
-**_The most advantageous aspects of this proposal are:_**
-**_1. It DOES NOT NEED re-compression; so it is handy for usage._**
-**_2. It provides a approximate solution to reverse playback; for small files, the result is acceptable._**
-**_3. Even for large file, it still works but in a "seek" mode._**
-**_4. It does NOT make player freeze, stop or hang (such as the case you try to play some 2K (or 4K) movies in X2 by_** **_adjusting audio & standalone clock; which means you may need to DO additional checks)._** 
-
+_**The most advantageous aspects of this proposal are:**_
+_**1. It DOES NOT NEED re-compression; so it is handy for usage.**_
+_**2. It provides a approximate solution to reverse playback; for small files, the result is acceptable.**_
+_**3. Even for large file, it still works but in a "seek" mode.**_
+_**4. It does NOT make player freeze, stop or hang (such as the case you try to play some 2K (or 4K) movies in X2 by_** **_adjusting audio & standalone clock; which means you may need to DO additional checks).**_ 
 
 We have made a demo UI to facilitate operation.
 The patch will be updated soon (after upload has completed) at:
