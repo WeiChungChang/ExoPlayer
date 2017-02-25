@@ -639,14 +639,14 @@ public class PlaybackControlView extends FrameLayout {
   }
 
   private void rewind() {
-	if (mIsRewind) {
-	  mSpeed = mSpeed.findNext();
-	} else {
-	  mIsRewind = true;
-	  mSpeed = TrickSpeed.TRICK_2;
-	}
-	player.setPlaybackSpeed(0 - mSpeed.speed);
-	Toast.makeText(mContext, "RWD x" + mSpeed.speed, Toast.LENGTH_SHORT).show();
+    if (mIsRewind) {
+      mSpeed = mSpeed.findNext();
+    } else {
+      mIsRewind = true;
+      mSpeed = TrickSpeed.TRICK_2;
+    }
+    player.setPlaybackSpeed(0 - mSpeed.speed);
+    Toast.makeText(mContext, "RWD x" + mSpeed.speed, Toast.LENGTH_SHORT).show();
   }
 
   private void fastForward() {
