@@ -227,8 +227,8 @@ public class PlaybackControlView extends FrameLayout {
   /** added by Sacha for using playback speed */
   enum TrickSpeed {
     TRICK_NORMAL(1), TRICK_2(2), TRICK_4(4), TRICK_8(8), TRICK_16(16), TRICK_32(32);
-
     public int speed;
+
     TrickSpeed (int speed) {
       this.speed = speed;
     }
@@ -643,7 +643,7 @@ public class PlaybackControlView extends FrameLayout {
       mSpeed = mSpeed.findNext();
     } else {
       mIsRewind = true;
-      mSpeed = TrickSpeed.TRICK_2;
+      mSpeed = TrickSpeed.TRICK_NORMAL;
     }
     player.setPlaybackSpeed(0 - mSpeed.speed);
     Toast.makeText(mContext, "RWD x" + mSpeed.speed, Toast.LENGTH_SHORT).show();
