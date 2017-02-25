@@ -14,7 +14,9 @@ as: https://github.com/WeiChungChang/ExoPlayer/commit/938d8e415dfea0a6ee9ff97a4a
 
 ## Development history ##
 [Provide the patch for trick playback when playing adaptive streaming content](#item1)
+
 [Propose the gereral solution for high speed & reverse playback funcationality](#item2)
+
 [Provide a clearer UI to set playback speed](#item3)
 
 <h2 id="item1">Provide the patch for trick playback when playing adaptive streaming content</h2>
@@ -159,10 +161,14 @@ and could be accessed at:
 `public static final long  TRICK_PLAY_DISPLAY_TIME_MS = 0; /*ms, original it is set to 500*/`
 
 _**The most advantageous aspects of this proposal are:**_
+
 _**1. It DOES NOT NEED re-compression; so it is handy for usage.**_
+
 _**2. It provides a approximate solution to reverse playback; for small files, the result is acceptable.**_
+
 _**3. Even for large file, it still works but in a "seek" mode.**_
-_**4. It does NOT make player freeze, stop or hang (such as the case you try to play some 2K (or 4K) movies in X2 by_** **_adjusting audio & standalone clock; which means you may need to DO additional checks).**_ 
+
+_**4. It does NOT make player freeze, stop or hang (such as the case you try to play some 2K (or 4K) movies in X2 by adjusting audio & standalone clock; which means you may need to DO additional checks).**_
 
 We have made a demo UI to facilitate operation.
 The patch will be updated soon (after upload has completed) at:
