@@ -13,19 +13,21 @@ as: https://github.com/WeiChungChang/ExoPlayer/commit/922529fd1d80ea51dc7bf0938a
 as: https://github.com/WeiChungChang/ExoPlayer/commit/938d8e415dfea0a6ee9ff97a4ae98e6720ed4514
 
 ## Development history ##
-[Provide the patch for trick playback when playing adaptive streaming content](#item1)
+[1. Provide the patch for trick playback when playing adaptive streaming content](#item1)
 
-[Propose the gereral solution for high speed & reverse playback funcationality](#item2)
+[2. Propose the gereral solution for high speed & reverse playback funcationality](#item2)
 
-[Provide a clearer UI to set playback speed](#item3)
+[3. Provide a clearer UI to set playback speed](#item3)
 
-<h2 id="item1">Provide the patch for trick playback when playing adaptive streaming content</h2>
+<h2 id="item1">1. Provide the patch for trick playback when playing adaptive streaming content</h2>
 
 Besides setting speed, **I think we should inform the track selection (AdaptiveVideoTrackSelection) also for adaptive streaming case.** **Otherwise, it may lead to rebuffering by wrongly (over) estimated bit-rate.**
 
 You could compare the result below to understand why we should do so.
+
 1. Without the patch, several re-buffering happened: 
 https://youtu.be/snDOuQ2yG5E
+
 2. With the patch, NO rebuffering anymore: 
 https://youtu.be/xyBz0rHZ5xY
 
@@ -36,12 +38,19 @@ It is, without informing AdaptiveVideoTrackSelection, we will select the represe
 
 For example, by the 4K test link https://www.youtube.com/watch?v=0wCC3aLXdOw, there are 8 representation sets there. The bit-rates from high to low are:
 r1. 22876018
+
 r2. 10577952
+
 r3. 4466109
+
 r4. 2354860
+
 r5. 1164538
+
 r6. 631150
+
 r7. 251705
+
 r8. ...
  
 For my trial here, the network speed is about 4500000 ~ 5500000. 
@@ -60,30 +69,39 @@ Also, I make a test on my fork at:
 https://github.com/WeiChungChang/ExoPlayer/tree/trickPlayBack
 Please refer to it.
 
-<h2 id="item1">Propose the gereral solution for high speed & reverse playback funcationality</h2>
+<h2 id="item2">2. Propose the gereral solution for high speed & reverse playback funcationality</h2>
 
 
 # Root cause:
 **It provides my way to response the call-for-feature of trick playback here** (an ‘acceptable’ way).
 It includes:
-**1.	_Locally reverse playback_.
-2._Locally high speed playback (more than X2 (or X4))_.**
+
+_**1.Locally reverse playback.**_
+
+_**2.Locally high speed playback (more than X2 (or X4)).**_
 
 The patch could be applied to streaming also. 
-**However, I will improve the streaming case hereafter.**
+**However, I will improve the streaming case hereafter for pending performance issue.**
 
 Patch = 
 https://github.com/WeiChungChang/ExoPlayer/commit/922529fd1d80ea51dc7bf0938a4960eb2708068c.
+
 It is based on:
 https://github.com/WeiChungChang/ExoPlayer/commit/5f441187588aa9f5b2b16934bd7fce356155c839.
 (a fix to include adaptive streaming case)
 
 Here a simple classification to trick playback is given below.
+
 1.a: locally low speed trick playback (ex: <=4 or <=2) (mainly achieved by operating audio or mediaclock speed)
+
 1.b: locally high speed trick playback (ex: >=8) (mainly achieved by seek)
+
 1.c: locally reverse playback (mainly achieved by seek).
+
 2.a: low speed trick playback by streaming(ex: <=4 or <=2).
+
 2.b: high speed trick playback by streaming(ex: >=8).
+
 2.c: reverse playback by streaming.
 
 ![1](https://cloud.githubusercontent.com/assets/14846473/23152166/1a5c933e-f83b-11e6-92fb-b324e2374a65.png)
@@ -111,25 +129,26 @@ https://youtu.be/0TQptRUerhU.
 ![design](https://cloud.githubusercontent.com/assets/14846473/23158369/ed5cd8b6-f859-11e6-80a9-8981ba543cdc.png)
 
 To implement trick playback by see, we need:
-_**1. Trigger seek internally.
-2. Calculate the next seek position.
-3. Decide the show time of each displayed frame**_
+**1. Trigger seek internally.**
+**2. Calculate the next seek position.**
+**3. Decide the show time of each displayed frame.**
 
 A simple way to implement is to create a standalone MediaClock instance at the control layer. 
 Set a default display time by, ex: 500 ms.
 When high speed trick playback starts (ex: x8), 
 1. we set corresponding time (current playback time) & speed(x8) to StandaloneMediaClock; starts it.
+
 2. deliver the first seek (target is current position).
-3. When the frame rendered (it takes some time), arrange the next seek (to be triggered after 500 ms).
-   set the seek target to (current position + speed *  display time).
+
+3. When the frame rendered (it takes some time), arrange the next seek (to be triggered after 500 ms). Set the seek target to (current position + speed *  display time).
 
 Step 3 recursively triggers seek to next position according to the playback speed.
 Finally, for fast forward if the target exceeds movie duration or for backward playback the target is less than 0, the playback is complete so we stop delivering next seek.
-  
 
 To evaluate if a design of trick playback is good enough,  the criterion may be:
-**_1. If the frames displayed well-demonstrate the critical scene of this movie.
-2. The displayed time is long enough to let the audiences to capture the instance they are interested in._**
+_**1. If the frames displayed well-demonstrate the critical scene of this movie.**_
+
+_**2. The displayed time is long enough to let the audiences to capture the instance they are interested in.**_
 
 In fact, there are a lot of ways to do it. A recent work could be referred below:
 [US20150016804.pdf](https://github.com/google/ExoPlayer/files/789665/US20150016804.pdf)
