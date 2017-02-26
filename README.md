@@ -111,10 +111,10 @@ According to this rough classification, **currently there may have been a scheme
 **Notice that even for X2 local playback, for a movie with 2K resolution, it still gets stuck by I\O bandwidth limit, as demo item 6** 
 
 Test movie: 
-2K =
-https://www.youtube.com/watch?v=iNJdPyoqt8U
-low bit-rate
-https://www.youtube.com/watch?v=3nmnMtbzzjE
+1. 2K = https://www.youtube.com/watch?v=iNJdPyoqt8U
+
+2. low bit-rate = https://www.youtube.com/watch?v=3nmnMtbzzjE
+
 
 # Demo:
 1.	**Pure 8X speed normal playback test**: https://youtu.be/7ghbtkWqHVA.
@@ -130,12 +130,15 @@ https://youtu.be/0TQptRUerhU.
 
 To implement trick playback by see, we need:
 **1. Trigger seek internally.**
+
 **2. Calculate the next seek position.**
+
 **3. Decide the show time of each displayed frame.**
 
 A simple way to implement is to create a standalone MediaClock instance at the control layer. 
 Set a default display time by, ex: 500 ms.
 When high speed trick playback starts (ex: x8), 
+
 1. we set corresponding time (current playback time) & speed(x8) to StandaloneMediaClock; starts it.
 
 2. deliver the first seek (target is current position).
@@ -146,6 +149,7 @@ Step 3 recursively triggers seek to next position according to the playback spee
 Finally, for fast forward if the target exceeds movie duration or for backward playback the target is less than 0, the playback is complete so we stop delivering next seek.
 
 To evaluate if a design of trick playback is good enough,  the criterion may be:
+
 _**1. If the frames displayed well-demonstrate the critical scene of this movie.**_
 
 _**2. The displayed time is long enough to let the audiences to capture the instance they are interested in.**_
@@ -165,16 +169,25 @@ _**In fact, the patch posted within**_ #https://github.com/WeiChungChang/ExoPlay
  **_could also serve as an approximate solution to reverse playback; with a little modification._**
 
 Please see the demo below; I tested it on my smart phone.
+
 1. https://youtu.be/47slacQbMug (diving, reverse from 2:07 to the beginning)
+
 2. https://youtu.be/b-nNe6eNR4U (baseball, reverse from 11:30 to 9:00)
 
+
 The original files are on YouTube:
+
 1. https://www.youtube.com/watch?v=ssY8K2wcxpE
+
 2. https://www.youtube.com/watch?v=wEFx6ly86Jo 
 
+
 and could be accessed at:
+
 1.https://drive.google.com/open?id=0B7H5vJR3qWj0WjFjclQ5T09GRnM
+
 2.https://drive.google.com/open?id=0B7H5vJR3qWj0MWwwVnRFaXNITGc
+
 
 **_Simply make the flow tries to DO AS BEST AS IT COULD, as below:_**
 `public static final long  TRICK_PLAY_DISPLAY_TIME_MS = 0; /*ms, original it is set to 500*/`
