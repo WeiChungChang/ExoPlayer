@@ -110,7 +110,8 @@ According to this rough classification, **currently there may have been a scheme
 
 **Notice that even for X2 local playback, for a movie with 2K resolution, it still gets stuck by I\O bandwidth limit, as demo item 6** 
 
-Test movie: 
+Test movie:
+
 1. 2K = https://www.youtube.com/watch?v=iNJdPyoqt8U
 
 2. low bit-rate = https://www.youtube.com/watch?v=3nmnMtbzzjE
@@ -129,6 +130,7 @@ https://youtu.be/0TQptRUerhU.
 ![design](https://cloud.githubusercontent.com/assets/14846473/23158369/ed5cd8b6-f859-11e6-80a9-8981ba543cdc.png)
 
 To implement trick playback by see, we need:
+
 **1. Trigger seek internally.**
 
 **2. Calculate the next seek position.**
@@ -208,8 +210,9 @@ https://github.com/WeiChungChang/ExoPlayer
 
 The demo can bee seen at:
 
-https://youtu.be/s-ODHJjpCBg
-https://youtu.be/leKRR93qFec (it is better to see the rewind effect from about 52 seconds the rewind button is pressed: https://youtu.be/leKRR93qFec?t=52)
+1. https://youtu.be/s-ODHJjpCBg
+
+2. https://youtu.be/leKRR93qFec (it is better to see the rewind effect from about 52 seconds the rewind button is pressed: https://youtu.be/leKRR93qFec?t=52)
 You could check the rewind functionality (-1X, -2X, -4X, -8X, -16X, -32X) also.
 
 Thanks a lot for @monkey-who's help for UI.
