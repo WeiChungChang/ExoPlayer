@@ -18,17 +18,15 @@ package com.google.android.exoplayer2.ui;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.os.Build;
 import android.os.SystemClock;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -39,6 +37,7 @@ import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.util.Util;
 import java.util.Formatter;
 import java.util.Locale;
+import android.widget.Toast;
 
 /**
  * A view for controlling {@link ExoPlayer} instances.
@@ -222,6 +221,30 @@ public class PlaybackControlView extends FrameLayout {
   private int showTimeoutMs;
   private long hideAtMs;
 
+  private Context mContext;
+  private TrickSpeed mSpeed = TrickSpeed.TRICK_NORMAL;
+  private boolean mIsRewind = false;
+
+  /** added by Sacha for using playback speed */
+  enum TrickSpeed {
+    TRICK_NORMAL(1), TRICK_2(2), TRICK_4(4), TRICK_8(8), TRICK_16(16), TRICK_32(32);
+    public int speed;
+
+    TrickSpeed (int speed) {
+      this.speed = speed;
+    }
+    public TrickSpeed findNext() {
+      boolean found = false;
+      for (TrickSpeed trickSpeed: TrickSpeed.values()) {
+        if (found) 
+          return trickSpeed;
+        if (trickSpeed.equals(this)) 
+          found = true;
+      }
+      return this;
+    }
+  }
+
   private final Runnable updateProgressAction = new Runnable() {
     @Override
     public void run() {
@@ -244,9 +267,9 @@ public class PlaybackControlView extends FrameLayout {
     this(context, attrs, 0);
   }
 
-    private Context mContext;
   public PlaybackControlView(Context context, AttributeSet attrs, int defStyleAttr) {
     super(context, attrs, defStyleAttr);
+
     mContext = context;
     int controllerLayoutId = R.layout.exo_playback_control_view;
     rewindMs = DEFAULT_REWIND_MS;
@@ -616,61 +639,27 @@ public class PlaybackControlView extends FrameLayout {
     }
   }
 
-    /** added by Sacha for using playback speed */
-    enum TrickSpeed {
-        // could use << operator to make it neat, but it might have x3 x7 speed in the future
-        TRICK_NORMAL(1), TRICK_2(2), TRICK_4(4), TRICK_8(8), TRICK_16(16), TRICK_32(32);
-
-        public int speed;
-        TrickSpeed (int speed) {
-            this.speed = speed;
-        }
-
-        public TrickSpeed findNext() {
-            boolean found = false;
-            for (TrickSpeed trickSpeed: TrickSpeed.values()) {
-                if (found) return trickSpeed;
-                if (trickSpeed.equals(this)) found = true;
-            }
-            return this;
-        }
+  private void rewind() {
+    if (mIsRewind) {
+      mSpeed = mSpeed.findNext();
+    } else {
+      mIsRewind = true;
+      mSpeed = TrickSpeed.TRICK_NORMAL;
     }
+    player.setPlaybackSpeed(0 - mSpeed.speed);
+    Toast.makeText(mContext, "RWD x" + mSpeed.speed, Toast.LENGTH_SHORT).show();
+  }
 
-    private TrickSpeed mSpeed = TrickSpeed.TRICK_NORMAL;
-    private boolean mIsRewind = false;
-    private final String MONKEY_TAG = "Sacha";
-    private void rewind() {
-        Log.d(MONKEY_TAG, "in rewind");
-        if (mIsRewind) {
-            mSpeed = mSpeed.findNext();
-        } else {
-            mIsRewind = true;
-            mSpeed = TrickSpeed.TRICK_2;
-        }
-        player.setPlaybackSpeed(0 - mSpeed.speed);
-        Toast.makeText(mContext, "RWD x" + mSpeed.speed, Toast.LENGTH_SHORT).show();
-
-        /*if (rewindMs <= 0) {
-            return;
-        }
-        seekTo(Math.max(player.getCurrentPosition() - rewindMs, 0));*/
+  private void fastForward() {
+    if (!mIsRewind) {
+      mSpeed = mSpeed.findNext();
+    } else {
+      mIsRewind = false;
+      mSpeed = TrickSpeed.TRICK_2;
     }
-
-    private void fastForward() {
-        Log.d(MONKEY_TAG, "in fast forward");
-        if (!mIsRewind) {
-            mSpeed = mSpeed.findNext();
-        } else {
-            mIsRewind = false;
-            mSpeed = TrickSpeed.TRICK_2;
-        }
-        player.setPlaybackSpeed(mSpeed.speed);
-        Toast.makeText(mContext, "FF x" + mSpeed.speed, Toast.LENGTH_SHORT).show();
-        /*if (fastForwardMs <= 0) {
-            return;
-        }
-        seekTo(Math.min(player.getCurrentPosition() + fastForwardMs, player.getDuration()));*/
-    }
+    player.setPlaybackSpeed(mSpeed.speed);
+    Toast.makeText(mContext, "FF x" + mSpeed.speed, Toast.LENGTH_SHORT).show();
+  }
 
   private void seekTo(long positionMs) {
     seekTo(player.getCurrentWindowIndex(), positionMs);
@@ -847,22 +836,21 @@ public class PlaybackControlView extends FrameLayout {
           rewind();
         } else if (playButton == view) {
           player.setPlayWhenReady(true);
-            resetTrickState();
+          resetTrickState();
         } else if (pauseButton == view) {
           player.setPlayWhenReady(false);
-            resetTrickState();
+          resetTrickState();
         }
       }
       hideAfterTimeout();
     }
 
-      private void resetTrickState() {
-          mSpeed = TrickSpeed.TRICK_NORMAL;
-          mIsRewind = false;
-          player.setPlaybackSpeed(1.0f);
-      }
-
   }
 
+  private void resetTrickState() {
+    mSpeed = TrickSpeed.TRICK_NORMAL;
+    mIsRewind = false;
+    player.setPlaybackSpeed(1.0f);
+  }
 
 }

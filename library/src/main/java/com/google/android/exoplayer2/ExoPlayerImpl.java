@@ -340,8 +340,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
   }
 
   @Override
-  public void setPlaybackSpeed(float speed) {
-      Log.d("Sacha", "ExoPlayerImpl - setPlaybackSpeed: " + speed);
+  public void setPlaybackSpeed(float speed) { 
     internalPlayer.setPlaybackSpeed(speed);
   }
 

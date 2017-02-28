@@ -61,7 +61,6 @@ public final class Util {
 
   public static final boolean TRICK_PLAY_TEST_HACK = false;
   public static final boolean TRICK_PLAY_HIGH_SPEED = true;
-  /** from john */
   public static final long  TRICK_PLAY_DISPLAY_TIME_MS = 0; /*ms*/
   public static final long MAX_NATIVE_SUPPORT_SPEED = 4;
   /**

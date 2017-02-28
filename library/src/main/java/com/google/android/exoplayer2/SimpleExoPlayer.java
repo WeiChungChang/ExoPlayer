@@ -20,6 +20,7 @@ import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.media.MediaCodec;
 import android.media.PlaybackParams;
+import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.IntDef;
 import android.util.Log;
@@ -1099,7 +1100,8 @@ public class SimpleExoPlayer implements ExoPlayer {
   public void setPlaybackSpeed(float speed) {
     this.speed = speed;
 
-    if (videoDecoderCounters != null && Util.isHighSpeed(speed)) {
+    if ((Build.VERSION.SDK_INT < 23)
+        || (videoDecoderCounters != null && Util.isHighSpeed(speed)) ) {
       standaloneMediaClock.start();
       long currentPositionMs = getCurrentPosition();
       standaloneMediaClock.setPositionUs(currentPositionMs * 1000);

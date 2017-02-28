@@ -3,11 +3,6 @@
     "name": "YouTube DASH",
     "samples": [
       {
-        "name": "water diving test",
-        "uri": " http://manifest.googlevideo.com/api/manifest/dash/as/fmp4_audio_clear,fmp4_sd_hd_clear/expire/1487939478/pl/18/itag/0/mt/1487917827/beids/[9452306]/hfr/1/id/o-AIAt1kGRZ4qsKpB3wDXdypeycFoUIkwGg2-w5a4DlgAM/ms/au/mn/sn-a5m7zne7/mv/m/source/youtube/mm/31/sparams/as,hfr,id,initcwndbps,ip,ipbits,itag,mm,mn,ms,mv,pl,playback_host,source,expire/ipbits/0/signature/C8727BD91F99D14BF8284FA2F9C58297B7B03A35.BB6DF2A0F2AE6638A9AA1A588D574F6088D44916/initcwndbps/9035000/ip/23.104.212.148/key/yt6/playback_host/r2---sn-a5m7zne7.googlevideo.com/upn/qJXGxhYg7bg",
-        "extension": "mpd"
-      },
-      {
         "name": "Google Glass (MP4,H264)",
         "uri": "http://www.youtube.com/api/manifest/dash/id/bf5bb2419360daf1/source/youtube?as=fmp4_audio_clear,fmp4_sd_hd_clear&sparams=ip,ipbits,expire,source,id,as&ip=0.0.0.0&ipbits=0&expire=19000000000&signature=51AF5F39AB0CEC3E5497CD9C900EBFEAECCCB5C7.8506521BFC350652163895D4C26DEE124209AA9E&key=ik0",
         "extension": "mpd"
@@ -26,6 +21,14 @@
         "name": "Google Play (WebM,VP9)",
         "uri": "http://www.youtube.com/api/manifest/dash/id/3aa39fa2cc27967f/source/youtube?as=fmp4_audio_clear,webm2_sd_hd_clear&sparams=ip,ipbits,expire,source,id,as&ip=0.0.0.0&ipbits=0&expire=19000000000&signature=B1C2A74783AC1CC4865EB312D7DD2D48230CC9FD.BD153B9882175F1F94BFE5141A5482313EA38E8D&key=ik0",
         "extension": "mpd"
+      },
+      {
+        "name": "original test movie",
+        "uri": "asset:///compare.mp4"
+      },
+      {
+        "name": "baseball test movie",
+        "uri": "asset:///baseball2.mp4"
       }
     ]
   },
@@ -332,7 +335,6 @@
   {
     "name": "Misc",
     "samples": [
-
       {
         "name": "Dizzy",
         "uri": "http://html5demos.com/assets/dizzy.mp4"
