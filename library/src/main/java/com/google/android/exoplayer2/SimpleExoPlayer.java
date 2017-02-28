@@ -20,6 +20,7 @@ import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.media.MediaCodec;
 import android.media.PlaybackParams;
+import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.IntDef;
 import android.util.Log;
@@ -27,6 +28,7 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.TextureView;
+
 import com.google.android.exoplayer2.audio.AudioCapabilities;
 import com.google.android.exoplayer2.audio.AudioRendererEventListener;
 import com.google.android.exoplayer2.audio.BufferProcessor;
@@ -43,16 +45,16 @@ import com.google.android.exoplayer2.text.Cue;
 import com.google.android.exoplayer2.text.TextRenderer;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
+import com.google.android.exoplayer2.util.StandaloneMediaClock;
+import com.google.android.exoplayer2.util.Util;
 import com.google.android.exoplayer2.video.MediaCodecVideoRenderer;
 import com.google.android.exoplayer2.video.VideoRendererEventListener;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.google.android.exoplayer2.util.Util;
-import com.google.android.exoplayer2.util.StandaloneMediaClock;
 
 /**
  * An {@link ExoPlayer} implementation that uses default {@link Renderer} components. Instances can
@@ -75,15 +77,15 @@ public class SimpleExoPlayer implements ExoPlayer {
      *     rotation in degrees that the application should apply for the video for it to be rendered
      *     in the correct orientation. This value will always be zero on API levels 21 and above,
      *     since the renderer will apply all necessary rotations internally. On earlier API levels
-     *     this is not possible. Applications that use {@link android.view.TextureView} can apply
-     *     the rotation by calling {@link android.view.TextureView#setTransform}. Applications that
+     *     this is not possible. Applications that use {@link TextureView} can apply
+     *     the rotation by calling {@link TextureView#setTransform}. Applications that
      *     do not expect to encounter rotated videos can safely ignore this parameter.
      * @param pixelWidthHeightRatio The width to height ratio of each pixel. For the normal case
      *     of square pixels this will be equal to 1.0. Different values are indicative of anamorphic
      *     content.
      */
     void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees,
-        float pixelWidthHeightRatio);
+                            float pixelWidthHeightRatio);
 
     /**
      * Called when a frame is rendered for the first time since setting the surface, and when a
@@ -154,8 +156,8 @@ public class SimpleExoPlayer implements ExoPlayer {
   private final StandaloneMediaClock standaloneMediaClock;
   private float speed;
   protected SimpleExoPlayer(Context context, TrackSelector trackSelector, LoadControl loadControl,
-      DrmSessionManager<FrameworkMediaCrypto> drmSessionManager,
-      @ExtensionRendererMode int extensionRendererMode, long allowedVideoJoiningTimeMs) {
+                            DrmSessionManager<FrameworkMediaCrypto> drmSessionManager,
+                            @ExtensionRendererMode int extensionRendererMode, long allowedVideoJoiningTimeMs) {
     mainHandler = new Handler();
     componentListener = new ComponentListener();
 
@@ -198,7 +200,7 @@ public class SimpleExoPlayer implements ExoPlayer {
    * Sets the video scaling mode.
    * <p>
    * Note that the scaling mode only applies if a {@link MediaCodec}-based video {@link Renderer} is
-   * enabled and if the output surface is owned by a {@link android.view.SurfaceView}.
+   * enabled and if the output surface is owned by a {@link SurfaceView}.
    *
    * @param videoScalingMode The video scaling mode.
    */
@@ -718,9 +720,9 @@ public class SimpleExoPlayer implements ExoPlayer {
    * @param out An array to which the built renderers should be appended.
    */
   protected void buildAudioRenderers(Context context, Handler mainHandler,
-      DrmSessionManager<FrameworkMediaCrypto> drmSessionManager,
-      @ExtensionRendererMode int extensionRendererMode, AudioRendererEventListener eventListener,
-      BufferProcessor[] bufferProcessors, ArrayList<Renderer> out) {
+                                     DrmSessionManager<FrameworkMediaCrypto> drmSessionManager,
+                                     @ExtensionRendererMode int extensionRendererMode, AudioRendererEventListener eventListener,
+                                     BufferProcessor[] bufferProcessors, ArrayList<Renderer> out) {
     out.add(new MediaCodecAudioRenderer(MediaCodecSelector.DEFAULT, drmSessionManager, true,
         mainHandler, eventListener, AudioCapabilities.getCapabilities(context), bufferProcessors));
 
@@ -871,7 +873,7 @@ public class SimpleExoPlayer implements ExoPlayer {
   }
 
   private final class ComponentListener implements VideoRendererEventListener,
-      AudioRendererEventListener, TextRenderer.Output, MetadataRenderer.Output,
+          AudioRendererEventListener, TextRenderer.Output, MetadataRenderer.Output,
       SurfaceHolder.Callback, TextureView.SurfaceTextureListener {
 
     // VideoRendererEventListener implementation
@@ -1097,9 +1099,9 @@ public class SimpleExoPlayer implements ExoPlayer {
 
   @Override
   public void setPlaybackSpeed(float speed) {
-    this.speed = speed;
-
-    if (videoDecoderCounters != null && Util.isHighSpeed(speed)) {
+      this.speed = speed;
+      if ((Build.VERSION.SDK_INT < 23 && speed != 1.0f)
+              || (Build.VERSION.SDK_INT >= 23 && videoDecoderCounters != null && Util.isHighSpeed(speed))) {
       standaloneMediaClock.start();
       long currentPositionMs = getCurrentPosition();
       standaloneMediaClock.setPositionUs(currentPositionMs * 1000);
