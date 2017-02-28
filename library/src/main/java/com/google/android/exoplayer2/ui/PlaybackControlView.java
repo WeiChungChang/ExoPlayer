@@ -18,7 +18,6 @@ package com.google.android.exoplayer2.ui;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.os.Build;
 import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
@@ -27,6 +26,8 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -35,9 +36,9 @@ import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.util.Util;
+
 import java.util.Formatter;
 import java.util.Locale;
-import android.widget.Toast;
 
 /**
  * A view for controlling {@link ExoPlayer} instances.
@@ -835,11 +836,11 @@ public class PlaybackControlView extends FrameLayout {
         } else if (rewindButton == view) {
           rewind();
         } else if (playButton == view) {
-          player.setPlayWhenReady(true);
-          resetTrickState();
+            resetTrickState();
+            player.setPlayWhenReady(true);
         } else if (pauseButton == view) {
-          player.setPlayWhenReady(false);
-          resetTrickState();
+            resetTrickState();
+            player.setPlayWhenReady(false);
         }
       }
       hideAfterTimeout();
