@@ -53,6 +53,7 @@ import java.util.List;
 
 import com.google.android.exoplayer2.util.Util;
 import com.google.android.exoplayer2.util.StandaloneMediaClock;
+import android.os.Build;
 
 /**
  * An {@link ExoPlayer} implementation that uses default {@link Renderer} components. Instances can
@@ -1099,7 +1100,8 @@ public class SimpleExoPlayer implements ExoPlayer {
   public void setPlaybackSpeed(float speed) {
     this.speed = speed;
 
-    if (videoDecoderCounters != null && Util.isHighSpeed(speed)) {
+    if ((Build.VERSION.SDK_INT < 23 && speed != 1.0f)
+        || (Build.VERSION.SDK_INT >= 23 && videoDecoderCounters != null && Util.isHighSpeed(speed))) {
       standaloneMediaClock.start();
       long currentPositionMs = getCurrentPosition();
       standaloneMediaClock.setPositionUs(currentPositionMs * 1000);
