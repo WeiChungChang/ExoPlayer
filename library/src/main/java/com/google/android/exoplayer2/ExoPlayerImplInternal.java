@@ -460,9 +460,6 @@ import com.google.android.exoplayer2.source.TrackGroup;
       } else {
         rendererPositionUs = standaloneMediaClock.getPositionUs();
       }
-      periodPositionUs = playingPeriodHolder.toPeriodTime(rendererPositionUs);
-      rendererPositionUs = rendererMediaClock.getPositionUs();
-      standaloneMediaClock.setPositionUs(rendererPositionUs);
       periodPositionUs = rendererPositionUs - playingPeriodHolder.rendererPositionOffsetUs;
     }
     playbackInfo.positionUs = periodPositionUs;
@@ -1443,13 +1440,15 @@ import com.google.android.exoplayer2.source.TrackGroup;
         for (int i = 0; i < renderers.length; i++) {
           messages[i] = new ExoPlayerMessage(renderers[i], C.MSG_SET_PLAYBACK_PARAMS, params);
         }
+        rendererPositionUs = rendererMediaClock.getPositionUs();
+        standaloneMediaClock.setPositionUs(rendererPositionUs);
+        standaloneMediaClock.setPlaybackSpeed(speed);
         try {
           sendMessagesInternal(messages);
         } catch (ExoPlaybackException e) {
           e.printStackTrace();
         }
       } else {
-        this.speed = speed;
         standaloneMediaClock.setPlaybackSpeed(speed);
         if (rendererMediaClock != null) {
           rendererMediaClock.setPlaybackSpeed(speed);
