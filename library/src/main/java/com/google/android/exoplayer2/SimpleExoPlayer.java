@@ -1103,8 +1103,8 @@ public class SimpleExoPlayer implements ExoPlayer {
     if ((Build.VERSION.SDK_INT < 23 && speed != 1.0f)
         || (Build.VERSION.SDK_INT >= 23 && videoDecoderCounters != null && Util.isHighSpeed(speed))) {
       standaloneMediaClock.start();
-      long currentPositionMs = getCurrentPosition();
-      standaloneMediaClock.setPositionUs(currentPositionMs * 1000);
+      long currentPositionMs = getCurrentPosition() + 50 /*100ms*/;
+      standaloneMediaClock.setPositionUs(C.msToUs(currentPositionMs));
       standaloneMediaClock.setPlaybackSpeed(speed);
 
       setPlayWhenReady(false);
