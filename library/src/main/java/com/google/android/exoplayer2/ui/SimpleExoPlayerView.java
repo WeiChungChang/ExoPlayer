@@ -48,6 +48,8 @@ import com.google.android.exoplayer2.ui.PlaybackControlView.SeekDispatcher;
 import com.google.android.exoplayer2.util.Assertions;
 import java.util.List;
 
+import android.util.Log;
+
 /**
  * A high level view for {@link SimpleExoPlayer} media playbacks. It displays video, subtitles and
  * album art during playback, and displays playback controls using a {@link PlaybackControlView}.
@@ -170,6 +172,8 @@ import java.util.List;
 @TargetApi(16)
 public final class SimpleExoPlayerView extends FrameLayout {
 
+  private static final String TAG = "DBG_UI_SimpleExoPlayerView";
+
   private static final int SURFACE_TYPE_NONE = 0;
   private static final int SURFACE_TYPE_SURFACE_VIEW = 1;
   private static final int SURFACE_TYPE_TEXTURE_VIEW = 2;
@@ -188,6 +192,12 @@ public final class SimpleExoPlayerView extends FrameLayout {
   private boolean useArtwork;
   private Bitmap defaultArtwork;
   private int controllerShowTimeoutMs;
+
+
+  float upX;
+  float upY;
+  float downX;
+  float downY;
 
   public SimpleExoPlayerView(Context context) {
     this(context, null);
@@ -539,9 +549,39 @@ public final class SimpleExoPlayerView extends FrameLayout {
 
   @Override
   public boolean onTouchEvent(MotionEvent ev) {
-    if (!useController || player == null || ev.getActionMasked() != MotionEvent.ACTION_DOWN) {
+    float X = ev.getX();
+    float Y = ev.getY();
+    if (!useController || player == null /*|| ev.getActionMasked() != MotionEvent.ACTION_DOWN*/) {
       return false;
     }
+
+    switch (ev.getAction()) {
+      case MotionEvent.ACTION_DOWN:
+        downX = ev.getX();
+        downY = ev.getY();
+        break;
+      case MotionEvent.ACTION_MOVE:
+        break; 
+      case MotionEvent.ACTION_UP:
+        Log.d(TAG, "onTouchEvent(): onTouchEvent-ACTION_UP");
+        upX = ev.getX();
+		upY = ev.getY();
+		float x = Math.abs(upX - downX);
+        float y = Math.abs(upY - downY);
+        double z = Math.sqrt((x * x) + (y * y));
+        int degree = Math.round((float)(Math.asin(y / z)/Math.PI * 180));
+        if (upY < downY && degree > 45) {
+          Log.d(TAG, "onTouchEvent-ACTION_UP degree" + degree + ", up");
+        }else if(upY > downY && degree > 45) {
+          Log.d(TAG, "onTouchEvent-ACTION_UP degree " + degree + ", down");
+        }else if(upX < downX && degree <= 45) {
+          Log.d(TAG, "onTouchEvent-ACTION_UP degree " + degree + ", left");
+        }else if(upX > downX && degree <= 45) {
+          Log.d(TAG, "onTouchEvent-ACTION_UP degree " + degree + ", right");
+        }
+        return true;
+    }
+		
     if (controller.isVisible()) {
       controller.hide();
     } else {
