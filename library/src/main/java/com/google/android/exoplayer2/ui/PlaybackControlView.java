@@ -220,6 +220,9 @@ public class PlaybackControlView extends FrameLayout {
   private int showTimeoutMs;
   private long hideAtMs;
 
+  private final View forwardframeStepButton;
+  private final View backframeStepButton;
+
   private Context mContext;
   private TrickSpeed mSpeed = TrickSpeed.TRICK_NORMAL;
   private boolean mIsRewind = false;
@@ -328,6 +331,17 @@ public class PlaybackControlView extends FrameLayout {
     if (fastForwardButton != null) {
       fastForwardButton.setOnClickListener(componentListener);
     }
+
+    forwardframeStepButton = findViewById(R.id.exo_fstep);
+    if (forwardframeStepButton != null) {
+      forwardframeStepButton.setOnClickListener(componentListener);
+    }
+
+    backframeStepButton = findViewById(R.id.exo_bstep);
+    if (backframeStepButton != null) {
+      backframeStepButton.setOnClickListener(componentListener);
+    }
+	
   }
 
   /**
@@ -476,6 +490,23 @@ public class PlaybackControlView extends FrameLayout {
     updateProgress();
   }
 
+  private void updateFrameStepButton(boolean playing) {
+    if (fastForwardButton != null) {
+      fastForwardButton.setVisibility(!playing ? View.GONE : View.VISIBLE);
+    }
+    if (forwardframeStepButton != null) {
+      forwardframeStepButton.setVisibility(playing ? View.GONE : View.VISIBLE);
+    }
+
+    if (rewindButton != null) {
+  	  rewindButton.setVisibility(!playing ? View.GONE : View.VISIBLE);
+    }
+    if (backframeStepButton != null) {
+  	  backframeStepButton.setVisibility(playing ? View.GONE : View.VISIBLE);
+    }
+  }
+
+
   private void updatePlayPauseButton() {
     if (!isVisible() || !isAttachedToWindow) {
       return;
@@ -490,6 +521,9 @@ public class PlaybackControlView extends FrameLayout {
       requestPlayPauseFocus |= !playing && pauseButton.isFocused();
       pauseButton.setVisibility(!playing ? View.GONE : View.VISIBLE);
     }
+
+    updateFrameStepButton(playing);
+
     if (requestPlayPauseFocus) {
       requestPlayPauseFocus();
     }
@@ -839,6 +873,12 @@ public class PlaybackControlView extends FrameLayout {
         } else if (pauseButton == view) {
           player.setPlayWhenReady(false);
           resetTrickState();
+        } else if (forwardframeStepButton == view) {
+          // preaper...
+          //player.forwardframeStep();
+        } else if (backframeStepButton == view) {
+          // preaper...
+          // player.backwardFrameStep();
         }
       }
       hideAfterTimeout();
