@@ -34,6 +34,9 @@
     <ImageButton android:id="@id/exo_rew"
       style="@style/ExoMediaButton.Rewind"/>
 
+    <ImageButton android:id="@id/exo_bstep"
+      style="@style/ExoMediaButton.RewindFrame"/>
+
     <ImageButton android:id="@id/exo_play"
       style="@style/ExoMediaButton.Play"/>
 
@@ -42,6 +45,9 @@
 
     <ImageButton android:id="@id/exo_ffwd"
       style="@style/ExoMediaButton.FastForward"/>
+
+    <ImageButton android:id="@id/exo_fstep"
+      style="@style/ExoMediaButton.ForwardFrame"/>
 
     <ImageButton android:id="@id/exo_next"
       style="@style/ExoMediaButton.Next"/>

@@ -36,6 +36,16 @@
     <item name="android:contentDescription">@string/exo_controls_fastforward_description</item>
   </style>
 
+  <style name="ExoMediaButton.ForwardFrame">
+    <item name="android:src">@drawable/forward_frame</item>
+    <item name="android:contentDescription">@string/exo_controls_fastforward_description</item>
+  </style>
+
+  <style name="ExoMediaButton.RewindFrame">
+    <item name="android:src">@drawable/backward_frame</item>
+    <item name="android:contentDescription">@string/exo_controls_fastforward_description</item>
+  </style>
+
   <style name="ExoMediaButton.Rewind">
     <item name="android:src">@drawable/exo_controls_rewind</item>
     <item name="android:contentDescription">@string/exo_controls_rewind_description</item>

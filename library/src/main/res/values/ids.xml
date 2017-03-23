@@ -30,5 +30,6 @@
   <item name="exo_duration" type="id"/>
   <item name="exo_position" type="id"/>
   <item name="exo_progress" type="id"/>
-
+  <item name="exo_fstep" type="id"/>
+  <item name="exo_bstep" type="id"/>
 </resources>
