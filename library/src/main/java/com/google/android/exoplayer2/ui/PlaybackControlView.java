@@ -538,6 +538,9 @@ public class PlaybackControlView extends FrameLayout {
     boolean isSeekable = false;
     boolean enablePrevious = false;
     boolean enableNext = false;
+
+    boolean playing = player != null && player.getPlayWhenReady();
+	
     if (haveNonEmptyTimeline) {
       int currentWindowIndex = player.getCurrentWindowIndex();
       currentTimeline.getWindow(currentWindowIndex, currentWindow);
@@ -548,8 +551,10 @@ public class PlaybackControlView extends FrameLayout {
     }
     setButtonEnabled(enablePrevious , previousButton);
     setButtonEnabled(enableNext, nextButton);
-    setButtonEnabled(fastForwardMs > 0 && isSeekable, fastForwardButton);
-    setButtonEnabled(rewindMs > 0 && isSeekable, rewindButton);
+    if (playing) {
+      setButtonEnabled(fastForwardMs > 0 && isSeekable, fastForwardButton);
+      setButtonEnabled(rewindMs > 0 && isSeekable, rewindButton);
+    }
     if (progressBar != null) {
       progressBar.setEnabled(isSeekable);
     }
