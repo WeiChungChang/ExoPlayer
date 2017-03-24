@@ -95,7 +95,7 @@ public interface VideoRendererEventListener {
    * @param surface The {@link Surface} to which a first frame has been rendered, or {@code null} if
    *     the renderer renders to something that isn't a {@link Surface}.
    */
-  void onRenderedFirstFrame(Surface surface);
+  void onRenderedFirstFrame(Surface surface, long bufferPresentationTimeUs);
 
   /**
    * Called when the renderer is disabled.
@@ -199,12 +199,12 @@ public interface VideoRendererEventListener {
     /**
      * Invokes {@link VideoRendererEventListener#onRenderedFirstFrame(Surface)}.
      */
-    public void renderedFirstFrame(final Surface surface) {
+    public void renderedFirstFrame(final Surface surface, final long bufferPresentationTimeUs) {    
       if (listener != null) {
         handler.post(new Runnable()  {
           @Override
           public void run() {
-            listener.onRenderedFirstFrame(surface);
+            listener.onRenderedFirstFrame(surface, bufferPresentationTimeUs);
           }
         });
       }

@@ -533,7 +533,7 @@ public class MediaCodecVideoRenderer extends MediaCodecRenderer {
   /* package */ void maybeNotifyRenderedFirstFrame() {
     if (!renderedFirstFrame) {
       renderedFirstFrame = true;
-      eventDispatcher.renderedFirstFrame(surface);
+      eventDispatcher.renderedFirstFrame(surface, C.TIME_UNSET);
     }
   }
 

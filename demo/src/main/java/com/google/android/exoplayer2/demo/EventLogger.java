@@ -273,7 +273,7 @@ import java.util.Locale;
   }
 
   @Override
-  public void onRenderedFirstFrame(Surface surface) {
+  public void onRenderedFirstFrame(Surface surface, long bufferPresentationTimeUs) {
     // Do nothing.
   }
 

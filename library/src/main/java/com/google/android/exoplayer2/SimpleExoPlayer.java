@@ -120,6 +120,8 @@ public class SimpleExoPlayer implements ExoPlayer {
   public static final int EXTENSION_RENDERER_MODE_PREFER = 2;
 
   private static final String TAG = "SimpleExoPlayer";
+  private static final String TAG1 = "SimpleExoPlayer_DBG_first_render";
+
   protected static final int MAX_DROPPED_VIDEO_FRAME_COUNT_TO_NOTIFY = 50;
 
   private final ExoPlayer player;
@@ -942,12 +944,15 @@ public class SimpleExoPlayer implements ExoPlayer {
     }
 
     @Override
-    public void onRenderedFirstFrame(Surface surface) {
+    public void onRenderedFirstFrame(Surface surface, long bufferPresentationTimeUs) {
+
+      Log.d(TAG1, "onRenderedFirstFrame() bufferPresentationTimeUs = " + bufferPresentationTimeUs);
+
       if (videoListener != null && SimpleExoPlayer.this.surface == surface) {
         videoListener.onRenderedFirstFrame();
       }
       if (videoDebugListener != null) {
-        videoDebugListener.onRenderedFirstFrame(surface);
+        videoDebugListener.onRenderedFirstFrame(surface, bufferPresentationTimeUs);
       }
       if (trickPlayBySeek) {
         /*issue next seek*/

@@ -279,7 +279,7 @@ public final class LibvpxVideoRenderer extends BaseRenderer {
       renderRgbFrame(outputBuffer, scaleToFit);
       if (!renderedFirstFrame) {
         renderedFirstFrame = true;
-        eventDispatcher.renderedFirstFrame(surface);
+        eventDispatcher.renderedFirstFrame(surface, C.TIME_UNSET);
       }
       outputBuffer.release();
     } else if (outputBuffer.mode == VpxDecoder.OUTPUT_MODE_YUV && outputBufferRenderer != null) {
@@ -287,7 +287,7 @@ public final class LibvpxVideoRenderer extends BaseRenderer {
       outputBufferRenderer.setOutputBuffer(outputBuffer);
       if (!renderedFirstFrame) {
         renderedFirstFrame = true;
-        eventDispatcher.renderedFirstFrame(null);
+        eventDispatcher.renderedFirstFrame(null, C.TIME_UNSET);
       }
     } else {
       outputBuffer.release();
