@@ -38,6 +38,8 @@ import java.util.Formatter;
 import java.util.Locale;
 import android.widget.Toast;
 
+import android.util.Log;
+
 /**
  * A view for controlling {@link ExoPlayer} instances.
  * <p>
@@ -144,6 +146,8 @@ import android.widget.Toast;
  * of {@code exo_playback_control_view.xml} for only the instance on which the attribute is set.
  */
 public class PlaybackControlView extends FrameLayout {
+
+  private static final String TAG = "DBG_icon_PlaybackControlView";
 
   /**
    * Listener to be notified about changes of the visibility of the UI control.
@@ -490,19 +494,31 @@ public class PlaybackControlView extends FrameLayout {
     updateProgress();
   }
 
+  private boolean shouldShowStepIcon(boolean playing) {
+    Log.d(TAG, "shouldShowStepIcon() playing = " + playing + " is high = " + Util.isHighSpeed(mSpeed.speed) + " speed " + mSpeed.speed + " mIsRewind " + mIsRewind);
+    if (playing || Util.isHighSpeed(mSpeed.speed) || mIsRewind) {
+      return false;
+    }
+    return true;
+  }
+
   private void updateFrameStepButton(boolean playing) {
     if (fastForwardButton != null) {
-      fastForwardButton.setVisibility(!playing ? View.GONE : View.VISIBLE);
+      Log.d(TAG, "fastForwardButton:");
+      fastForwardButton.setVisibility((shouldShowStepIcon(playing)) ? View.GONE : View.VISIBLE);
     }
     if (forwardFrameStepButton != null) {
-      forwardFrameStepButton.setVisibility(playing ? View.GONE : View.VISIBLE);
+      Log.d(TAG, "forwardFrameStepButton:");
+      forwardFrameStepButton.setVisibility((!shouldShowStepIcon(playing)) ? View.GONE : View.VISIBLE);
     }
 
     if (rewindButton != null) {
-  	  rewindButton.setVisibility(!playing ? View.GONE : View.VISIBLE);
+      Log.d(TAG, "rewindButton:");
+  	  rewindButton.setVisibility((shouldShowStepIcon(playing)) ? View.GONE : View.VISIBLE);
     }
     if (backwardFrameStepButton != null) {
-  	  backwardFrameStepButton.setVisibility(playing ? View.GONE : View.VISIBLE);
+      Log.d(TAG, "backwardFrameStepButton:");
+  	  backwardFrameStepButton.setVisibility((!shouldShowStepIcon(playing)) ? View.GONE : View.VISIBLE);
     }
   }
 
