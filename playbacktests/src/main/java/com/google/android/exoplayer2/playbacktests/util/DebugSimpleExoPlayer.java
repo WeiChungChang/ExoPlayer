@@ -104,7 +104,7 @@ public class DebugSimpleExoPlayer extends SimpleExoPlayer {
     }
 
     @Override
-    protected void onProcessedOutputBuffer(long presentationTimeUs) {
+    protected void onProcessedOutputBuffer(long presentationTimeUs, int renderType) {
       bufferCount++;
       long expectedTimestampUs = dequeueTimestamp();
       if (expectedTimestampUs != presentationTimeUs) {

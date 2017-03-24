@@ -332,32 +332,36 @@ public class MediaCodecAudioRenderer extends MediaCodecRenderer implements Media
   }
 
   @Override
-  protected boolean processOutputBuffer(long positionUs, long elapsedRealtimeUs, MediaCodec codec,
+  protected int processOutputBuffer(long positionUs, long elapsedRealtimeUs, MediaCodec codec,
       ByteBuffer buffer, int bufferIndex, int bufferFlags, long bufferPresentationTimeUs,
       boolean shouldSkip) throws ExoPlaybackException {
     if (passthroughEnabled && (bufferFlags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
       // Discard output buffers from the passthrough (raw) decoder containing codec specific data.
       codec.releaseOutputBuffer(bufferIndex, false);
-      return true;
+      //return true;
+      return C.BUFFER_SKIPPED;
     }
 
     if (shouldSkip) {
       codec.releaseOutputBuffer(bufferIndex, false);
       decoderCounters.skippedOutputBufferCount++;
       audioTrack.handleDiscontinuity();
-      return true;
+      //return true;
+      return C.BUFFER_SKIPPED;
     }
 
     try {
       if (audioTrack.handleBuffer(buffer, bufferPresentationTimeUs)) {
         codec.releaseOutputBuffer(bufferIndex, false);
         decoderCounters.renderedOutputBufferCount++;
-        return true;
+        //return true;
+        return C.BUFFER_RENDERED;
       }
     } catch (AudioTrack.InitializationException | AudioTrack.WriteException e) {
       throw ExoPlaybackException.createForRenderer(e, getIndex());
     }
-    return false;
+    //return false;
+    return C.BUFFER_NOT_PROCESSED;
   }
 
   @Override

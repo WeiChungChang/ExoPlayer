@@ -113,6 +113,7 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
   }
 
   private static final String TAG = "MediaCodecRenderer";
+  private static final String TAG1 = "DBG_render_type_MediaCodecRenderer";
 
   /**
    * If the {@link MediaCodec} is hotswapped (i.e. replaced during playback), this is the period of
@@ -206,6 +207,8 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
 
   protected DecoderCounters decoderCounters;
 
+  protected long bufferPresentationTimeUs;
+
   /**
    * @param trackType The track type that the renderer handles. One of the {@code C.TRACK_TYPE_*}
    *     constants defined in {@link C}.
@@ -232,6 +235,8 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
     outputBufferInfo = new MediaCodec.BufferInfo();
     codecReconfigurationState = RECONFIGURATION_STATE_NONE;
     codecReinitializationState = REINITIALIZATION_STATE_NONE;
+
+    bufferPresentationTimeUs = C.TIME_UNSET;
   }
 
   @Override
@@ -393,6 +398,9 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
 
   @Override
   protected void onPositionReset(long positionUs, boolean joining) throws ExoPlaybackException {
+    Log.d(TAG1, "onPositionReset() type " + getTrackType() + " positionUs " + positionUs);
+    bufferPresentationTimeUs = C.TIME_UNSET;
+
     inputStreamEnded = false;
     outputStreamEnded = false;
     if (codec != null) {
@@ -815,7 +823,10 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
    *
    * @param presentationTimeUs The timestamp associated with the output buffer.
    */
-  protected void onProcessedOutputBuffer(long presentationTimeUs) {
+  protected void onProcessedOutputBuffer(long presentationTimeUs, int renderType) {
+    Log.d(TAG1, "onProcessedOutputBuffer() pts " + presentationTimeUs + " render type " + (renderType == C.BUFFER_RENDERED ? "render" : "skip") + " type " + getTrackType());
+    if (renderType == C.BUFFER_RENDERED)
+      bufferPresentationTimeUs = presentationTimeUs;
     // Do nothing.
   }
 
@@ -922,7 +933,7 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
       }
     }
 
-    boolean processedOutputBuffer;
+    int processedOutputBuffer;
     if (codecNeedsEosOutputExceptionWorkaround && codecReceivedEos) {
       try {
         processedOutputBuffer = processOutputBuffer(positionUs, elapsedRealtimeUs, codec,
@@ -942,8 +953,8 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
           outputBufferInfo.presentationTimeUs, shouldSkipOutputBuffer);
     }
 
-    if (processedOutputBuffer) {
-      onProcessedOutputBuffer(outputBufferInfo.presentationTimeUs);
+    if (processedOutputBuffer != C.BUFFER_NOT_PROCESSED) {
+      onProcessedOutputBuffer(outputBufferInfo.presentationTimeUs, processedOutputBuffer);
       outputIndex = C.INDEX_UNSET;
       return true;
     }
@@ -1006,7 +1017,7 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
    * @return Whether the output buffer was fully processed (e.g. rendered or skipped).
    * @throws ExoPlaybackException If an error occurs processing the output buffer.
    */
-  protected abstract boolean processOutputBuffer(long positionUs, long elapsedRealtimeUs,
+  protected abstract int processOutputBuffer(long positionUs, long elapsedRealtimeUs,
       MediaCodec codec, ByteBuffer buffer, int bufferIndex, int bufferFlags,
       long bufferPresentationTimeUs, boolean shouldSkip) throws ExoPlaybackException;
 

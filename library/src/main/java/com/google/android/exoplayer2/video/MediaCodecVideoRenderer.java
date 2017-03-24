@@ -392,12 +392,13 @@ public class MediaCodecVideoRenderer extends MediaCodecRenderer {
   }
 
   @Override
-  protected boolean processOutputBuffer(long positionUs, long elapsedRealtimeUs, MediaCodec codec,
+  protected int processOutputBuffer(long positionUs, long elapsedRealtimeUs, MediaCodec codec,
       ByteBuffer buffer, int bufferIndex, int bufferFlags, long bufferPresentationTimeUs,
       boolean shouldSkip) {
     if (shouldSkip) {
       skipOutputBuffer(codec, bufferIndex);
-      return true;
+      //return true;
+      return C.BUFFER_SKIPPED; 
     }
 
     if (!renderedFirstFrame) {
@@ -406,11 +407,13 @@ public class MediaCodecVideoRenderer extends MediaCodecRenderer {
       } else {
         renderOutputBuffer(codec, bufferIndex);
       }
-      return true;
+      //return true;
+      return C.BUFFER_RENDERED;
     }
 
     if (getState() != STATE_STARTED) {
-      return false;
+      //return false;
+      return C.BUFFER_NOT_PROCESSED;
     }
 
     // Compute how many microseconds it is until the buffer's presentation time.
@@ -429,14 +432,16 @@ public class MediaCodecVideoRenderer extends MediaCodecRenderer {
     if (shouldDropOutputBuffer(earlyUs, elapsedRealtimeUs)) {
       // We're more than 30ms late rendering the frame.
       dropOutputBuffer(codec, bufferIndex);
-      return true;
+      //return true;
+      return C.BUFFER_SKIPPED;
     }
 
     if (Util.SDK_INT >= 21) {
       // Let the underlying framework time the release.
       if (earlyUs < 50000) {
         renderOutputBufferV21(codec, bufferIndex, adjustedReleaseTimeNs);
-        return true;
+        //return true;
+        return C.BUFFER_RENDERED;
       }
     } else {
       // We need to time the release ourselves.
@@ -452,12 +457,14 @@ public class MediaCodecVideoRenderer extends MediaCodecRenderer {
           }
         }
         renderOutputBuffer(codec, bufferIndex);
-        return true;
+        //return true;
+        return C.BUFFER_RENDERED;
       }
     }
 
     // We're either not playing, or it's not time to render the frame yet.
-    return false;
+    //return false;
+    return C.BUFFER_NOT_PROCESSED;
   }
 
   /**

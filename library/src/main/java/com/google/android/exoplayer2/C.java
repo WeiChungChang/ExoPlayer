@@ -34,6 +34,12 @@ public final class C {
 
   private C() {}
 
+  public static final int BUFFER_NOT_PROCESSED = 0;
+
+  public static final int BUFFER_SKIPPED = 1;
+
+  public static final int BUFFER_RENDERED = 2;
+
   /**
    * Special constant representing a time corresponding to the end of a source. Suitable for use in
    * any time base.
