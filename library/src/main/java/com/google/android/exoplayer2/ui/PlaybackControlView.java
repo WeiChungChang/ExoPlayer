@@ -220,8 +220,8 @@ public class PlaybackControlView extends FrameLayout {
   private int showTimeoutMs;
   private long hideAtMs;
 
-  private final View forwardframeStepButton;
-  private final View backframeStepButton;
+  private final View forwardFrameStepButton;
+  private final View backwardFrameStepButton;
 
   private Context mContext;
   private TrickSpeed mSpeed = TrickSpeed.TRICK_NORMAL;
@@ -332,14 +332,14 @@ public class PlaybackControlView extends FrameLayout {
       fastForwardButton.setOnClickListener(componentListener);
     }
 
-    forwardframeStepButton = findViewById(R.id.exo_fstep);
-    if (forwardframeStepButton != null) {
-      forwardframeStepButton.setOnClickListener(componentListener);
+    forwardFrameStepButton = findViewById(R.id.exo_fstep);
+    if (forwardFrameStepButton != null) {
+      forwardFrameStepButton.setOnClickListener(componentListener);
     }
 
-    backframeStepButton = findViewById(R.id.exo_bstep);
-    if (backframeStepButton != null) {
-      backframeStepButton.setOnClickListener(componentListener);
+    backwardFrameStepButton = findViewById(R.id.exo_bstep);
+    if (backwardFrameStepButton != null) {
+      backwardFrameStepButton.setOnClickListener(componentListener);
     }
 	
   }
@@ -494,15 +494,15 @@ public class PlaybackControlView extends FrameLayout {
     if (fastForwardButton != null) {
       fastForwardButton.setVisibility(!playing ? View.GONE : View.VISIBLE);
     }
-    if (forwardframeStepButton != null) {
-      forwardframeStepButton.setVisibility(playing ? View.GONE : View.VISIBLE);
+    if (forwardFrameStepButton != null) {
+      forwardFrameStepButton.setVisibility(playing ? View.GONE : View.VISIBLE);
     }
 
     if (rewindButton != null) {
   	  rewindButton.setVisibility(!playing ? View.GONE : View.VISIBLE);
     }
-    if (backframeStepButton != null) {
-  	  backframeStepButton.setVisibility(playing ? View.GONE : View.VISIBLE);
+    if (backwardFrameStepButton != null) {
+  	  backwardFrameStepButton.setVisibility(playing ? View.GONE : View.VISIBLE);
     }
   }
 
@@ -878,10 +878,10 @@ public class PlaybackControlView extends FrameLayout {
         } else if (pauseButton == view) {
           resetTrickState();
           player.setPlayWhenReady(false);
-        } else if (forwardframeStepButton == view) {
+        } else if (forwardFrameStepButton == view) {
           // preaper...
           //player.forwardframeStep();
-        } else if (backframeStepButton == view) {
+        } else if (backwardFrameStepButton == view) {
           // preaper...
           // player.backwardFrameStep();
         }
