@@ -834,11 +834,11 @@ public class PlaybackControlView extends FrameLayout {
         } else if (rewindButton == view) {
           rewind();
         } else if (playButton == view) {
+          resetTrickState();
           player.setPlayWhenReady(true);
-          resetTrickState();
         } else if (pauseButton == view) {
-          player.setPlayWhenReady(false);
           resetTrickState();
+          player.setPlayWhenReady(false);
         }
       }
       hideAfterTimeout();
