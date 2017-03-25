@@ -39,8 +39,6 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
   private static final String TAG = "ExoPlayerImpl";
   private static final String TAG1 = "DBG_FW_frame_step_ExoPlayerImpl";
-  private static final String TAG2 = "DBG_1";
-
 
   private final Renderer[] renderers;
   private final TrackSelector trackSelector;
@@ -383,8 +381,6 @@ import java.util.concurrent.CopyOnWriteArraySet;
       case ExoPlayerImplInternal.MSG_SEEK_ACK: {
         if (--pendingSeekAcks == 0) {
           playbackInfo = (ExoPlayerImplInternal.PlaybackInfo) msg.obj;
-          //playbackInfo.videoPositionUs = C.TIME_UNSET;
-          Log.d(TAG2, "MSG_SEEK_ACK thread id " + Thread.currentThread().getId() + " " + playbackInfo.videoPositionUs.get() + " " + playbackInfo);
           if (msg.arg1 != 0) {
             for (EventListener listener : listeners) {
               listener.onPositionDiscontinuity();
@@ -428,12 +424,10 @@ import java.util.concurrent.CopyOnWriteArraySet;
     if (playWhenReady) {
       return;
     }
-    Log.d(TAG2, " ");
-    Log.d(TAG2, "forwardFrameStep() videoPositionUs = " + playbackInfo.videoPositionUs.get() + " " + C.TIME_UNSET + " thread " + Thread.currentThread().getId() + " " + playbackInfo);
-    if (playbackInfo.videoPositionUs.get() == C.TIME_UNSET) {
+    if (playbackInfo.videoPositionUs == C.TIME_UNSET) {
       return;
     }
-    seekTo(C.usToMs(playbackInfo.videoPositionUs.get() + 10000/*10ms*/));
+    seekTo(C.usToMs(playbackInfo.videoPositionUs + 10000/*10ms*/));
   }
 
 }

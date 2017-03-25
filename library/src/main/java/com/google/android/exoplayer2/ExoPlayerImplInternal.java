@@ -60,7 +60,7 @@ import java.util.concurrent.atomic.AtomicLong;
     public final int periodIndex;
     public final long startPositionUs;
 
-    public AtomicLong videoPositionUs;
+    public volatile long videoPositionUs;
 
     public volatile long positionUs;
     public volatile long bufferedPositionUs;
@@ -73,15 +73,14 @@ import java.util.concurrent.atomic.AtomicLong;
       positionUs = startPositionUs;
       bufferedPositionUs = startPositionUs;
 
-      videoPositionUs = new AtomicLong(C.TIME_UNSET);
-      Log.d(TAG2, "PlaybackInfo " + videoPositionUs.get() + " " + videoPositionUs + " " + Thread.currentThread().getId() + " " + this);
+      videoPositionUs = C.TIME_UNSET;
     }
 
     public PlaybackInfo copyWithPeriodIndex(int periodIndex) {
       PlaybackInfo playbackInfo = new PlaybackInfo(periodIndex, startPositionUs);
       playbackInfo.positionUs = positionUs;
       playbackInfo.bufferedPositionUs = bufferedPositionUs;
-      playbackInfo.videoPositionUs.set(videoPositionUs.get());
+      playbackInfo.videoPositionUs = videoPositionUs;
       return playbackInfo;
     }
 
@@ -105,8 +104,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
   private static final String TAG = "ExoPlayerImplInternal";
   private static final String TAG1 = "DBG_Renderer_time_ExoPlayerImplInternal";
-  private static final String TAG2 = "DBG_1";
-
 
   // External messages
   public static final int MSG_STATE_CHANGED = 1;
@@ -460,7 +457,10 @@ import java.util.concurrent.atomic.AtomicLong;
   private void updateVideoPlaybackPosition() {
     for (Renderer renderer : enabledRenderers) {
       if (renderer.getTrackType() == C.TRACK_TYPE_VIDEO) {
-        playbackInfo.videoPositionUs.set(renderer.getLastProcessedSampleTimeUs(C.BUFFER_RENDERED) - RENDERER_TIMESTAMP_OFFSET_US);
+        long videoNowUs = renderer.getLastProcessedSampleTimeUs(C.BUFFER_RENDERED);
+        if (videoNowUs != C.TIME_UNSET) {
+          playbackInfo.videoPositionUs = (videoNowUs - RENDERER_TIMESTAMP_OFFSET_US);
+        }
         //Log.d(TAG1, "updateVideoPlaybackPosition() " + playbackInfo.videoPositionUs);
       }
     }
