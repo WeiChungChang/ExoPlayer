@@ -43,6 +43,8 @@ import com.google.android.exoplayer2.util.Util;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.source.TrackGroup;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 /**
  * Implements the internal behavior of {@link ExoPlayerImpl}.
  */
@@ -58,10 +60,12 @@ import com.google.android.exoplayer2.source.TrackGroup;
     public final int periodIndex;
     public final long startPositionUs;
 
+    public AtomicLong videoPositionUs;
+
     public volatile long positionUs;
     public volatile long bufferedPositionUs;
 
-    public volatile long videoPositionUs;
+    
 
     public PlaybackInfo(int periodIndex, long startPositionUs) {
       this.periodIndex = periodIndex;
@@ -69,13 +73,15 @@ import com.google.android.exoplayer2.source.TrackGroup;
       positionUs = startPositionUs;
       bufferedPositionUs = startPositionUs;
 
-      videoPositionUs = C.TIME_UNSET;
+      videoPositionUs = new AtomicLong(C.TIME_UNSET);
+      Log.d(TAG2, "PlaybackInfo " + videoPositionUs.get() + " " + videoPositionUs + " " + Thread.currentThread().getId() + " " + this);
     }
 
     public PlaybackInfo copyWithPeriodIndex(int periodIndex) {
       PlaybackInfo playbackInfo = new PlaybackInfo(periodIndex, startPositionUs);
       playbackInfo.positionUs = positionUs;
       playbackInfo.bufferedPositionUs = bufferedPositionUs;
+      playbackInfo.videoPositionUs.set(videoPositionUs.get());
       return playbackInfo;
     }
 
@@ -99,6 +105,7 @@ import com.google.android.exoplayer2.source.TrackGroup;
 
   private static final String TAG = "ExoPlayerImplInternal";
   private static final String TAG1 = "DBG_Renderer_time_ExoPlayerImplInternal";
+  private static final String TAG2 = "DBG_1";
 
 
   // External messages
@@ -453,7 +460,7 @@ import com.google.android.exoplayer2.source.TrackGroup;
   private void updateVideoPlaybackPosition() {
     for (Renderer renderer : enabledRenderers) {
       if (renderer.getTrackType() == C.TRACK_TYPE_VIDEO) {
-        playbackInfo.videoPositionUs = renderer.getLastProcessedSampleTimeUs(C.BUFFER_RENDERED) - RENDERER_TIMESTAMP_OFFSET_US;
+        playbackInfo.videoPositionUs.set(renderer.getLastProcessedSampleTimeUs(C.BUFFER_RENDERED) - RENDERER_TIMESTAMP_OFFSET_US);
         //Log.d(TAG1, "updateVideoPlaybackPosition() " + playbackInfo.videoPositionUs);
       }
     }

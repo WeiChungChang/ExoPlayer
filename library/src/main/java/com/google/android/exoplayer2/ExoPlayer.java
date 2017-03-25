@@ -476,4 +476,6 @@ public interface ExoPlayer {
    */
   void setPlaybackSpeed(float speed);
 
+  void forwardFrameStep();
+
 }

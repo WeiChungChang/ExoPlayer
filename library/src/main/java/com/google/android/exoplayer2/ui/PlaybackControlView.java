@@ -896,7 +896,7 @@ public class PlaybackControlView extends FrameLayout {
           player.setPlayWhenReady(false);
         } else if (forwardFrameStepButton == view) {
           // preaper...
-          //player.forwardframeStep();
+          player.forwardFrameStep();
         } else if (backwardFrameStepButton == view) {
           // preaper...
           // player.backwardFrameStep();

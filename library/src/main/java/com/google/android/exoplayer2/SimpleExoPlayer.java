@@ -1122,4 +1122,8 @@ public class SimpleExoPlayer implements ExoPlayer {
     player.setPlaybackSpeed(speed);
   }
 
+  @Override
+  public void forwardFrameStep() {
+    player.forwardFrameStep();
+  }
 }
