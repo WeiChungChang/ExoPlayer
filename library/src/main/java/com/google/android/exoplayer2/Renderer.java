@@ -254,4 +254,6 @@ public interface Renderer extends ExoPlayerComponent {
    */
   void disable();
 
+  long getLastProcessedSampleTimeUs(int type);
+
 }

@@ -207,7 +207,7 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
 
   protected DecoderCounters decoderCounters;
 
-  protected long bufferPresentationTimeUs;
+  protected long bufferRenderedPresentationTimeUs;
 
   /**
    * @param trackType The track type that the renderer handles. One of the {@code C.TRACK_TYPE_*}
@@ -236,7 +236,7 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
     codecReconfigurationState = RECONFIGURATION_STATE_NONE;
     codecReinitializationState = REINITIALIZATION_STATE_NONE;
 
-    bufferPresentationTimeUs = C.TIME_UNSET;
+    bufferRenderedPresentationTimeUs = C.TIME_UNSET;
   }
 
   @Override
@@ -399,7 +399,7 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
   @Override
   protected void onPositionReset(long positionUs, boolean joining) throws ExoPlaybackException {
     Log.d(TAG1, "onPositionReset() type " + getTrackType() + " positionUs " + positionUs);
-    bufferPresentationTimeUs = C.TIME_UNSET;
+    bufferRenderedPresentationTimeUs = C.TIME_UNSET;
 
     inputStreamEnded = false;
     outputStreamEnded = false;
@@ -825,9 +825,9 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
    */
   protected void onProcessedOutputBuffer(long presentationTimeUs, int renderType) {
     Log.d(TAG1, "onProcessedOutputBuffer() pts " + presentationTimeUs + " render type " + (renderType == C.BUFFER_RENDERED ? "render" : "skip") + " type " + getTrackType());
-    if (renderType == C.BUFFER_RENDERED)
-      bufferPresentationTimeUs = presentationTimeUs;
-    // Do nothing.
+    if (renderType == C.BUFFER_RENDERED) {
+      bufferRenderedPresentationTimeUs = presentationTimeUs;
+    }
   }
 
   /**
@@ -1171,6 +1171,14 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
   private static boolean codecNeedsMonoChannelCountWorkaround(String name, Format format) {
     return Util.SDK_INT <= 18 && format.channelCount == 1
         && "OMX.MTK.AUDIO.DECODER.MP3".equals(name);
+  }
+
+  @Override
+  public long getLastProcessedSampleTimeUs(int type) {
+    if (type == C.BUFFER_RENDERED) {
+      return bufferRenderedPresentationTimeUs;
+    }
+    return C.TIME_UNSET;
   }
 
 }

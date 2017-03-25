@@ -303,4 +303,9 @@ public abstract class BaseRenderer implements Renderer, RendererCapabilities {
     stream.skipToKeyframeBefore(timeUs);
   }
 
+  @Override  
+  public long getLastProcessedSampleTimeUs(int type) {
+    return C.TIME_UNSET;
+  }
+
 }

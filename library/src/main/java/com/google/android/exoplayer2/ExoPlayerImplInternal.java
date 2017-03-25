@@ -61,11 +61,15 @@ import com.google.android.exoplayer2.source.TrackGroup;
     public volatile long positionUs;
     public volatile long bufferedPositionUs;
 
+    public volatile long videoPositionUs;
+
     public PlaybackInfo(int periodIndex, long startPositionUs) {
       this.periodIndex = periodIndex;
       this.startPositionUs = startPositionUs;
       positionUs = startPositionUs;
       bufferedPositionUs = startPositionUs;
+
+      videoPositionUs = C.TIME_UNSET;
     }
 
     public PlaybackInfo copyWithPeriodIndex(int periodIndex) {
@@ -94,6 +98,8 @@ import com.google.android.exoplayer2.source.TrackGroup;
   }
 
   private static final String TAG = "ExoPlayerImplInternal";
+  private static final String TAG1 = "DBG_Renderer_time_ExoPlayerImplInternal";
+
 
   // External messages
   public static final int MSG_STATE_CHANGED = 1;
@@ -444,6 +450,15 @@ import com.google.android.exoplayer2.source.TrackGroup;
     }
   }
 
+  private void updateVideoPlaybackPosition() {
+    for (Renderer renderer : enabledRenderers) {
+      if (renderer.getTrackType() == C.TRACK_TYPE_VIDEO) {
+        playbackInfo.videoPositionUs = renderer.getLastProcessedSampleTimeUs(C.BUFFER_RENDERED) - RENDERER_TIMESTAMP_OFFSET_US;
+        //Log.d(TAG1, "updateVideoPlaybackPosition() " + playbackInfo.videoPositionUs);
+      }
+    }
+  }
+
   private void updatePlaybackPositions() throws ExoPlaybackException {
     if (playingPeriodHolder == null) {
       return;
@@ -464,6 +479,8 @@ import com.google.android.exoplayer2.source.TrackGroup;
     }
     playbackInfo.positionUs = periodPositionUs;
     elapsedRealtimeUs = SystemClock.elapsedRealtime() * 1000;
+
+    updateVideoPlaybackPosition();
 
     // Update the buffered position.
     long bufferedPositionUs = enabledRenderers.length == 0 ? C.TIME_END_OF_SOURCE
