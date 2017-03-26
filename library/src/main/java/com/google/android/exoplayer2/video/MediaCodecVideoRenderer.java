@@ -48,7 +48,7 @@ import java.nio.ByteBuffer;
 /**
  * Decodes and renders video using {@link MediaCodec}.
  */
-@TargetApi(16)
+//@TargetApi(16)
 public class MediaCodecVideoRenderer extends MediaCodecRenderer {
 
   private static final String TAG = "MediaCodecVideoRenderer";
@@ -56,6 +56,8 @@ public class MediaCodecVideoRenderer extends MediaCodecRenderer {
   private static final String KEY_CROP_RIGHT = "crop-right";
   private static final String KEY_CROP_BOTTOM = "crop-bottom";
   private static final String KEY_CROP_TOP = "crop-top";
+
+  private static final String TAG1 = "DBG_MediaCodecVideoRenderer";
 
   // Long edge length in pixels for standard video formats, in decreasing in order.
   private static final int[] STANDARD_LONG_EDGE_VIDEO_PX = new int[] {
@@ -347,7 +349,7 @@ public class MediaCodecVideoRenderer extends MediaCodecRenderer {
   @Override
   protected void onQueueInputBuffer(DecoderInputBuffer buffer) {
     if (Util.SDK_INT < 23 && tunneling) {
-      maybeNotifyRenderedFirstFrame();
+      //maybeNotifyRenderedFirstFrame();
     }
   }
 
@@ -508,7 +510,7 @@ public class MediaCodecVideoRenderer extends MediaCodecRenderer {
     TraceUtil.endSection();
     decoderCounters.renderedOutputBufferCount++;
     consecutiveDroppedFrameCount = 0;
-    maybeNotifyRenderedFirstFrame();
+    //maybeNotifyRenderedFirstFrame();
   }
 
   @TargetApi(21)
@@ -519,7 +521,7 @@ public class MediaCodecVideoRenderer extends MediaCodecRenderer {
     TraceUtil.endSection();
     decoderCounters.renderedOutputBufferCount++;
     consecutiveDroppedFrameCount = 0;
-    maybeNotifyRenderedFirstFrame();
+    //maybeNotifyRenderedFirstFrame();
   }
 
   private void clearRenderedFirstFrame() {
@@ -537,10 +539,12 @@ public class MediaCodecVideoRenderer extends MediaCodecRenderer {
     }
   }
 
-  /* package */ void maybeNotifyRenderedFirstFrame() {
+  @Override
+  protected /* package */ void maybeNotifyRenderedFirstFrame() {
     if (!renderedFirstFrame) {
       renderedFirstFrame = true;
-      eventDispatcher.renderedFirstFrame(surface, C.TIME_UNSET);
+      Log.d(TAG1, "maybeNotifyRenderedFirstFrame() " + bufferRenderedPresentationTimeUs);
+      eventDispatcher.renderedFirstFrame(surface, bufferRenderedPresentationTimeUs);
     }
   }
 
@@ -825,7 +829,7 @@ public class MediaCodecVideoRenderer extends MediaCodecRenderer {
         // Stale event.
         return;
       }
-      maybeNotifyRenderedFirstFrame();
+      //maybeNotifyRenderedFirstFrame();
     }
 
   }

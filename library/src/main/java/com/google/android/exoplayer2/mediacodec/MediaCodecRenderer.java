@@ -816,6 +816,10 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
     // Do nothing.
   }
 
+  protected void maybeNotifyRenderedFirstFrame() {
+    // Do nothing.
+  }
+
   /**
    * Called when an output buffer is successfully processed.
    * <p>
@@ -827,6 +831,7 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
     Log.d(TAG1, "onProcessedOutputBuffer() pts " + presentationTimeUs + " render type " + (renderType == C.BUFFER_RENDERED ? "render" : "skip") + " type " + getTrackType());
     if (renderType == C.BUFFER_RENDERED) {
       bufferRenderedPresentationTimeUs = presentationTimeUs;
+      maybeNotifyRenderedFirstFrame();
     }
   }
 

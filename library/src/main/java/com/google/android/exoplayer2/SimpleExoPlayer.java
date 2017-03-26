@@ -55,11 +55,13 @@ import com.google.android.exoplayer2.util.Util;
 import com.google.android.exoplayer2.util.StandaloneMediaClock;
 import android.os.Build;
 
+import android.os.SystemClock;
+
 /**
  * An {@link ExoPlayer} implementation that uses default {@link Renderer} components. Instances can
  * be obtained from {@link ExoPlayerFactory}.
  */
-@TargetApi(16)
+//@TargetApi(16)
 public class SimpleExoPlayer implements ExoPlayer {
 
   /**
@@ -156,6 +158,9 @@ public class SimpleExoPlayer implements ExoPlayer {
   boolean trickPlayBySeek;
   private final StandaloneMediaClock standaloneMediaClock;
   private float speed;
+
+  private long frameStepStartTimeMs;
+
   protected SimpleExoPlayer(Context context, TrackSelector trackSelector, LoadControl loadControl,
       DrmSessionManager<FrameworkMediaCrypto> drmSessionManager,
       @ExtensionRendererMode int extensionRendererMode, long allowedVideoJoiningTimeMs) {
@@ -944,15 +949,15 @@ public class SimpleExoPlayer implements ExoPlayer {
     }
 
     @Override
-    public void onRenderedFirstFrame(Surface surface, long bufferPresentationTimeUs) {
+    public void onRenderedFirstFrame(Surface surface, long bufferRenderedPresentationTimeUs) {
 
-      Log.d(TAG1, "onRenderedFirstFrame() bufferPresentationTimeUs = " + bufferPresentationTimeUs);
+      //Log.d(TAG1, "onRenderedFirstFrame() bufferPresentationTimeUs = " + bufferRenderedPresentationTimeUs + " " + (SystemClock.elapsedRealtime() - frameStepStartTimeMs));
 
       if (videoListener != null && SimpleExoPlayer.this.surface == surface) {
         videoListener.onRenderedFirstFrame();
       }
       if (videoDebugListener != null) {
-        videoDebugListener.onRenderedFirstFrame(surface, bufferPresentationTimeUs);
+        videoDebugListener.onRenderedFirstFrame(surface, bufferRenderedPresentationTimeUs);
       }
       if (trickPlayBySeek) {
         /*issue next seek*/
@@ -1124,6 +1129,7 @@ public class SimpleExoPlayer implements ExoPlayer {
 
   @Override
   public void forwardFrameStep() {
+    frameStepStartTimeMs = SystemClock.elapsedRealtime();
     player.forwardFrameStep();
   }
 }
