@@ -881,7 +881,7 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
 
   private void handleFrameTimeUsQueue(long presentationTimeUs) {
     long presentationTimeUsFormQueue = frameTimeUsQueue.remove();
-    Assertions.checkArgument(((presentationTimeUsFormQueue + C.RENDERER_TIMESTAMP_OFFSET_US) != presentationTimeUs));
+    Assertions.checkArgument(((presentationTimeUsFormQueue + C.RENDERER_TIMESTAMP_OFFSET_US) == presentationTimeUs));
   }
 
   /**
