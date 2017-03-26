@@ -21,6 +21,8 @@ import com.google.android.exoplayer2.util.Assertions;
 import com.google.android.exoplayer2.util.MediaClock;
 import java.io.IOException;
 
+import java.util.PriorityQueue;
+
 /**
  * An abstract base class suitable for most {@link Renderer} implementations.
  */
@@ -36,6 +38,7 @@ public abstract class BaseRenderer implements Renderer, RendererCapabilities {
   private boolean readEndOfStream;
   private boolean streamIsFinal;
 
+  protected final PriorityQueue<Long> frameTimeUsQueue;
   /**
    * @param trackType The track type that the renderer handles. One of the {@link C}
    * {@code TRACK_TYPE_*} constants.
@@ -43,6 +46,8 @@ public abstract class BaseRenderer implements Renderer, RendererCapabilities {
   public BaseRenderer(int trackType) {
     this.trackType = trackType;
     readEndOfStream = true;
+
+    frameTimeUsQueue = new PriorityQueue<>();
   }
 
   @Override
@@ -274,6 +279,7 @@ public abstract class BaseRenderer implements Renderer, RendererCapabilities {
         readEndOfStream = true;
         return streamIsFinal ? C.RESULT_BUFFER_READ : C.RESULT_NOTHING_READ;
       }
+      frameTimeUsQueue.add(buffer.timeUs);
       buffer.timeUs += streamOffsetUs;
     } else if (result == C.RESULT_FORMAT_READ) {
       Format format = formatHolder.format;

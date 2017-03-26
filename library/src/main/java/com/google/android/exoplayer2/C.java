@@ -34,6 +34,8 @@ public final class C {
 
   private C() {}
 
+  public static final int RENDERER_TIMESTAMP_OFFSET_US = 60000000;
+
   public static final int BUFFER_NOT_PROCESSED = 0;
 
   public static final int BUFFER_SKIPPED = 1;

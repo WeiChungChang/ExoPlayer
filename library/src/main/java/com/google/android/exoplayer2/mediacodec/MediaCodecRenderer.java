@@ -513,6 +513,9 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
   }
 
   protected void flushCodec() throws ExoPlaybackException {
+
+    frameTimeUsQueue.clear();
+	
     codecHotswapDeadlineMs = C.TIME_UNSET;
     inputIndex = C.INDEX_UNSET;
     outputIndex = C.INDEX_UNSET;
@@ -828,7 +831,7 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
    * @param presentationTimeUs The timestamp associated with the output buffer.
    */
   protected void onProcessedOutputBuffer(long presentationTimeUs, int renderType) {
-    Log.d(TAG1, "onProcessedOutputBuffer() pts " + presentationTimeUs + " render type " + (renderType == C.BUFFER_RENDERED ? "render" : "skip") + " type " + getTrackType());
+    //Log.d(TAG1, "onProcessedOutputBuffer() pts " + presentationTimeUs + " render type " + (renderType == C.BUFFER_RENDERED ? "render" : "skip") + " type " + getTrackType());
     if (renderType == C.BUFFER_RENDERED) {
       bufferRenderedPresentationTimeUs = presentationTimeUs;
       maybeNotifyRenderedFirstFrame();
@@ -874,6 +877,11 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
    */
   protected long getDequeueOutputBufferTimeoutUs() {
     return 0;
+  }
+
+  private void handleFrameTimeUsQueue(long presentationTimeUs) {
+    long presentationTimeUsFormQueue = frameTimeUsQueue.remove();
+    Assertions.checkArgument(((presentationTimeUsFormQueue + C.RENDERER_TIMESTAMP_OFFSET_US) != presentationTimeUs));
   }
 
   /**
@@ -959,6 +967,7 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
     }
 
     if (processedOutputBuffer != C.BUFFER_NOT_PROCESSED) {
+      handleFrameTimeUsQueue(outputBufferInfo.presentationTimeUs);
       onProcessedOutputBuffer(outputBufferInfo.presentationTimeUs, processedOutputBuffer);
       outputIndex = C.INDEX_UNSET;
       return true;
