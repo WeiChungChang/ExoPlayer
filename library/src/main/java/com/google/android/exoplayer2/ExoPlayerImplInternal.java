@@ -457,7 +457,7 @@ import java.util.concurrent.atomic.AtomicLong;
   private void updateVideoPlaybackPosition() {
     for (Renderer renderer : enabledRenderers) {
       if (renderer.getTrackType() == C.TRACK_TYPE_VIDEO) {
-        long videoNowUs = renderer.getLastProcessedSampleTimeUs(C.BUFFER_RENDERED);
+        long videoNowUs = renderer.getLatestProcessedSampleTimeUs(C.BUFFER_RENDERED);
         if (videoNowUs != C.TIME_UNSET) {
           playbackInfo.videoPositionUs = (videoNowUs - RENDERER_TIMESTAMP_OFFSET_US);
         }

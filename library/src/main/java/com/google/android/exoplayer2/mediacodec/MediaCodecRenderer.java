@@ -1188,7 +1188,7 @@ public abstract class MediaCodecRenderer extends BaseRenderer {
   }
 
   @Override
-  public long getLastProcessedSampleTimeUs(int type) {
+  public long getLatestProcessedSampleTimeUs(int type) {
     if (type == C.BUFFER_RENDERED) {
       return bufferRenderedPresentationTimeUs;
     }

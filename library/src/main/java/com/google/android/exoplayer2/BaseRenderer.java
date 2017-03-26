@@ -310,8 +310,16 @@ public abstract class BaseRenderer implements Renderer, RendererCapabilities {
   }
 
   @Override  
-  public long getLastProcessedSampleTimeUs(int type) {
+  public long getLatestProcessedSampleTimeUs(int type) {
     return C.TIME_UNSET;
+  }
+
+  @Override
+  public long getLatestReadInPresentationTime() {
+    if (frameTimeUsQueue.size() == 0) {
+      return C.TIME_UNSET;
+    }
+    return frameTimeUsQueue.peek();
   }
 
 }
