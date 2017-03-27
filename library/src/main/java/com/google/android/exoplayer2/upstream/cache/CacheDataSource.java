@@ -30,12 +30,16 @@ import java.io.InterruptedIOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+import android.util.Log;
+
 /**
  * A {@link DataSource} that reads and writes a {@link Cache}. Requests are fulfilled from the cache
  * when possible. When data is not cached it is requested from an upstream {@link DataSource} and
  * written into the cache.
  */
 public final class CacheDataSource implements DataSource {
+
+  private static final String TAG = "DBG_trace_CacheDataSource";
 
   /**
    * Default maximum single cache file size.
@@ -192,6 +196,8 @@ public final class CacheDataSource implements DataSource {
 
   @Override
   public int read(byte[] buffer, int offset, int readLength) throws IOException {
+    Log.d(TAG, "read() off " + offset + " length " + readLength);
+  
     if (readLength == 0) {
       return 0;
     }

@@ -23,6 +23,12 @@ import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.util.Util;
 
+import com.google.android.exoplayer2.upstream.cache.CacheDataSource;
+import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor;
+import com.google.android.exoplayer2.upstream.cache.SimpleCache;
+import java.io.File;
+import com.google.android.exoplayer2.upstream.cache.CacheDataSourceFactory;
+
 /**
  * Placeholder application to facilitate overriding Application methods for debugging and testing.
  */
@@ -44,6 +50,18 @@ public class DemoApplication extends Application {
   public HttpDataSource.Factory buildHttpDataSourceFactory(DefaultBandwidthMeter bandwidthMeter) {
     return new DefaultHttpDataSourceFactory(userAgent, bandwidthMeter);
   }
+
+  public DataSource.Factory buildDataSourceFactory(boolean cache, final DefaultBandwidthMeter bandwidthMeter, final CacheDataSource.EventListener listener) {
+    if (!cache) {
+      return new DefaultDataSourceFactory(this, bandwidthMeter,
+          buildHttpDataSourceFactory(bandwidthMeter));
+    }
+    LeastRecentlyUsedCacheEvictor evictor = new LeastRecentlyUsedCacheEvictor(100 * 1024 * 1024);
+    SimpleCache simpleCache = new SimpleCache(new File(getCacheDir(), "media_cache"), evictor);
+    return new CacheDataSourceFactory(simpleCache, buildHttpDataSourceFactory(bandwidthMeter), CacheDataSource.FLAG_BLOCK_ON_CACHE);
+
+  }
+
 
   public boolean useExtensionRenderers() {
     return BuildConfig.FLAVOR.equals("withExtensions");

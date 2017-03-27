@@ -21,10 +21,14 @@ import com.google.android.exoplayer2.upstream.DataSource.Factory;
 import com.google.android.exoplayer2.upstream.FileDataSourceFactory;
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource.EventListener;
 
+import android.util.Log;
+
 /**
  * A {@link DataSource.Factory} that produces {@link CacheDataSource}.
  */
 public final class CacheDataSourceFactory implements DataSource.Factory {
+
+  private static final String TAG = "DBG_trace_CacheDataSource_CacheDataSourceFactory";
 
   private final Cache cache;
   private final DataSource.Factory upstreamFactory;
@@ -38,6 +42,7 @@ public final class CacheDataSourceFactory implements DataSource.Factory {
    */
   public CacheDataSourceFactory(Cache cache, DataSource.Factory upstreamFactory, int flags) {
     this(cache, upstreamFactory, flags, CacheDataSource.DEFAULT_MAX_CACHE_FILE_SIZE);
+    Log.d(TAG, "CacheDataSourceFactory()");
   }
 
   /**
