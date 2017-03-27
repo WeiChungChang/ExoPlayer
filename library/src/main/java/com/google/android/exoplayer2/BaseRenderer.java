@@ -22,6 +22,7 @@ import com.google.android.exoplayer2.util.MediaClock;
 import java.io.IOException;
 
 import java.util.PriorityQueue;
+import java.util.Iterator;
 
 /**
  * An abstract base class suitable for most {@link Renderer} implementations.
@@ -319,7 +320,11 @@ public abstract class BaseRenderer implements Renderer, RendererCapabilities {
     if (frameTimeUsQueue.size() == 0) {
       return C.TIME_UNSET;
     }
-    return frameTimeUsQueue.peek();
+    Iterator<Long> iter = frameTimeUsQueue.iterator();
+    while(iter.hasNext()){
+      // advance, do nothing.
+    }
+    return iter.next();
   }
 
 }
