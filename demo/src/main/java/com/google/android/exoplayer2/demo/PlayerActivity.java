@@ -106,6 +106,7 @@ public class PlayerActivity extends Activity implements OnClickListener, ExoPlay
   private Button retryButton;
 
   private DataSource.Factory mediaDataSourceFactory;
+  private DataSource.Factory dashMediaDataSourceFactory;
   private SimpleExoPlayer player;
   private DefaultTrackSelector trackSelector;
   private TrackSelectionHelper trackSelectionHelper;
@@ -124,6 +125,7 @@ public class PlayerActivity extends Activity implements OnClickListener, ExoPlay
     shouldAutoPlay = true;
     clearResumePosition();
     mediaDataSourceFactory = buildDataSourceFactory(true);
+    dashMediaDataSourceFactory = buildDataSourceFactory(true, true);
     mainHandler = new Handler();
     if (CookieHandler.getDefault() != DEFAULT_COOKIE_MANAGER) {
       CookieHandler.setDefault(DEFAULT_COOKIE_MANAGER);
@@ -324,7 +326,8 @@ public class PlayerActivity extends Activity implements OnClickListener, ExoPlay
             new DefaultSsChunkSource.Factory(mediaDataSourceFactory), mainHandler, eventLogger);
       case C.TYPE_DASH:
         return new DashMediaSource(uri, buildDataSourceFactory(false),
-            new DefaultDashChunkSource.Factory(mediaDataSourceFactory), mainHandler, eventLogger);
+            new DefaultDashChunkSource.Factory(dashMediaDataSourceFactory), mainHandler, eventLogger);
+            //new DefaultDashChunkSource.Factory(mediaDataSourceFactory), mainHandler, eventLogger);
       case C.TYPE_HLS:
         return new HlsMediaSource(uri, mediaDataSourceFactory, mainHandler, eventLogger);
       case C.TYPE_OTHER:
@@ -376,6 +379,12 @@ public class PlayerActivity extends Activity implements OnClickListener, ExoPlay
   private void clearResumePosition() {
     resumeWindow = C.INDEX_UNSET;
     resumePosition = C.TIME_UNSET;
+  }
+
+  
+  private DataSource.Factory buildDataSourceFactory(boolean cache, boolean useBandwidthMeter) {
+    return ((DemoApplication) getApplication())
+        .buildDataSourceFactory(true, useBandwidthMeter ? BANDWIDTH_METER : null, null);
   }
 
   /**
