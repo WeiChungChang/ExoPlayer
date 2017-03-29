@@ -286,6 +286,29 @@ public class DashManifestParser extends DefaultHandler
       }
     } while (!XmlPullParserUtil.isEndTag(xpp, "AdaptationSet"));
 
+    if (Util.maxBitrareOnly || Util.minBitrareOnly) {
+      int maxBitrate = Integer.MIN_VALUE;
+      int minBitrate = Integer.MAX_VALUE;
+      int targetIndex = -1;
+      for (int i = 0; i < representationInfos.size(); i++) {
+        RepresentationInfo now = representationInfos.get(i);
+        if (Util.maxBitrareOnly) {
+          if (maxBitrate < now.format.bitrate) {
+            targetIndex = i;
+            maxBitrate = now.format.bitrate;
+          }
+        } else {
+          if (minBitrate > now.format.bitrate) {
+            targetIndex = i;
+            minBitrate = now.format.bitrate;
+          }
+        }
+      }
+      RepresentationInfo target = representationInfos.get(targetIndex);
+      representationInfos.clear();
+      representationInfos.add(target);
+    }
+
     // Build the representations.
     List<Representation> representations = new ArrayList<>(representationInfos.size());
     for (int i = 0; i < representationInfos.size(); i++) {

@@ -59,6 +59,9 @@ import java.util.regex.Pattern;
  */
 public final class Util {
 
+  public static final boolean minBitrareOnly = true;
+  public static final boolean maxBitrareOnly = false;
+
   public static final boolean TRICK_PLAY_TEST_HACK = false;
   public static final boolean TRICK_PLAY_HIGH_SPEED = true;
   public static final long  TRICK_PLAY_DISPLAY_TIME_MS = 0; /*ms*/
