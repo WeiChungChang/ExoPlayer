@@ -66,6 +66,10 @@ public final class Util {
   public static final boolean TRICK_PLAY_HIGH_SPEED = true;
   public static final long  TRICK_PLAY_DISPLAY_TIME_MS = 0; /*ms*/
   public static final long MAX_NATIVE_SUPPORT_SPEED = 4;
+
+  public static final String YTPatternDT = "https://www.youtube.com/watch?v=";
+  public static final String YTPatternMobile = "https://youtu.be/";
+  
   /**
    * Like {@link android.os.Build.VERSION#SDK_INT}, but in a place where it can be conveniently
    * overridden for local testing.
@@ -109,6 +113,17 @@ public final class Util {
   private static final Pattern ESCAPED_CHARACTER_PATTERN = Pattern.compile("%([A-Fa-f0-9]{2})");
 
   private Util() {}
+
+
+  public static boolean YTChecker(String url) {
+    boolean fromYTDT = url.contains(YTPatternDT);
+    boolean fromYTMobile = url.contains(YTPatternMobile);
+    if (fromYTDT || fromYTMobile) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   public static boolean isHighSpeed(float speed) {
     if (((speed > MAX_NATIVE_SUPPORT_SPEED) || (speed < 0))) {

@@ -57,32 +57,49 @@ public class SampleChooserActivity extends Activity {
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
+    boolean YTFlow = false;
+  
     super.onCreate(savedInstanceState);
     setContentView(R.layout.sample_chooser_activity);
     Intent intent = getIntent();
-    String dataUri = intent.getDataString();
-    String[] uris;
-    if (dataUri != null) {
-      uris = new String[] {dataUri};
-    } else {
-      ArrayList<String> uriList = new ArrayList<>();
-      AssetManager assetManager = getAssets();
-      try {
-        for (String asset : assetManager.list("")) {
-          if (asset.endsWith(".exolist.json")) {
-            uriList.add("asset:///" + asset);
-          }
-        }
-      } catch (IOException e) {
-        Toast.makeText(getApplicationContext(), R.string.sample_list_load_error, Toast.LENGTH_LONG)
-            .show();
-      }
-      uris = new String[uriList.size()];
-      uriList.toArray(uris);
-      Arrays.sort(uris);
+
+    Bundle extras = getIntent().getExtras();
+    if (extras != null) {
+      String url = extras.getString(Intent.EXTRA_TEXT);
+      Log.d(TAG, "onCreate() " + url);
+      YTFlow = Util.YTChecker(url);
+      Log.d(TAG, "onCreate() YT flow = " + YTFlow);
     }
-    SampleListLoader loaderTask = new SampleListLoader();
-    loaderTask.execute(uris);
+	
+    if (YTFlow) {
+      String url = extras.getString(Intent.EXTRA_TEXT);
+      Sample uriSample = new UriSample("fromYT", null, null, null, false, url, "mpd");
+      startActivity(uriSample.buildIntent(this));
+    } else {	
+      String dataUri = intent.getDataString();
+      String[] uris;
+      if (dataUri != null) {
+        uris = new String[] {dataUri};
+      } else {
+        ArrayList<String> uriList = new ArrayList<>();
+        AssetManager assetManager = getAssets();
+        try {
+          for (String asset : assetManager.list("")) {
+            if (asset.endsWith(".exolist.json")) {
+              uriList.add("asset:///" + asset);
+            }
+          }
+        } catch (IOException e) {
+          Toast.makeText(getApplicationContext(), R.string.sample_list_load_error, Toast.LENGTH_LONG)
+              .show();
+        }
+        uris = new String[uriList.size()];
+        uriList.toArray(uris);
+        Arrays.sort(uris);
+      }
+      SampleListLoader loaderTask = new SampleListLoader();
+      loaderTask.execute(uris);
+    }
   }
 
   private void onSampleGroups(final List<SampleGroup> groups, boolean sawError) {
