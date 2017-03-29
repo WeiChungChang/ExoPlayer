@@ -47,6 +47,8 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import com.google.android.exoplayer2.util.DashURIGetter;
+
 /**
  * A DASH {@link MediaSource}.
  */
@@ -402,6 +404,22 @@ public final class DashMediaSource implements MediaSource {
     synchronized (manifestUriLock) {
       manifestUri = this.manifestUri;
     }
+
+    if (Util.YTChecker(manifestUri.toString())) {
+      DashURIGetter dashURIGetter = new DashURIGetter(manifestUri.toString());
+      try { 
+        dashURIGetter.retrieve();
+        String newUri = dashURIGetter.getInfo("dashmpd");
+        if (newUri != null) {
+          Uri steal_url = Uri.parse(newUri);
+          manifestUri = steal_url;
+        }
+      }
+      catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+	
     startLoading(new ParsingLoadable<>(dataSource, manifestUri, C.DATA_TYPE_MANIFEST,
         manifestParser), manifestCallback, minLoadableRetryCount);
   }

@@ -72,7 +72,7 @@ public class SampleChooserActivity extends Activity {
     }
 	
     if (YTFlow) {
-      String url = extras.getString(Intent.EXTRA_TEXT);
+      String url = extras.getString(Intent.EXTRA_TEXT);	  
       Sample uriSample = new UriSample("fromYT", null, null, null, false, url, "mpd");
       startActivity(uriSample.buildIntent(this));
     } else {	
