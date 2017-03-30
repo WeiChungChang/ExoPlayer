@@ -66,9 +66,11 @@ public class SampleChooserActivity extends Activity {
     Bundle extras = getIntent().getExtras();
     if (extras != null) {
       String url = extras.getString(Intent.EXTRA_TEXT);
-      Log.d(TAG, "onCreate() " + url);
-      YTFlow = Util.YTChecker(url);
-      Log.d(TAG, "onCreate() YT flow = " + YTFlow);
+      if (url != null) {
+        Log.d(TAG, "onCreate() " + url);
+        YTFlow = Util.YTChecker(url);
+        Log.d(TAG, "onCreate() YT flow = " + YTFlow);
+      }
     }
 	
     if (YTFlow) {
