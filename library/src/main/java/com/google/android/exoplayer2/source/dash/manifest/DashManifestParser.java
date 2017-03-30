@@ -48,6 +48,10 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
+import java.util.PriorityQueue;
+import java.util.Comparator;
+
+
 /**
  * A parser of media presentation description files.
  */
@@ -55,6 +59,7 @@ public class DashManifestParser extends DefaultHandler
     implements ParsingLoadable.Parser<DashManifest> {
 
   private static final String TAG = "MpdParser";
+  private static final String TAG1 = "MpdParser_test";
 
   private static final Pattern FRAME_RATE_PATTERN = Pattern.compile("(\\d+)(?:/(\\d+))?");
 
@@ -64,6 +69,8 @@ public class DashManifestParser extends DefaultHandler
 
   private final String contentId;
   private final XmlPullParserFactory xmlParserFactory;
+
+  protected final PriorityQueue<RepresentationInfo> representationInfoQueue;
 
   /**
    * Equivalent to calling {@code new DashManifestParser(null)}.
@@ -79,6 +86,16 @@ public class DashManifestParser extends DefaultHandler
     this.contentId = contentId;
     try {
       xmlParserFactory = XmlPullParserFactory.newInstance();
+
+      representationInfoQueue =
+          new PriorityQueue<RepresentationInfo>(10, new Comparator<RepresentationInfo>(){
+            public int compare(RepresentationInfo a, RepresentationInfo b){
+              if (a.format.width > b.format.width) return 1;
+              return -1;
+            }
+          });
+
+	  
     } catch (XmlPullParserException e) {
       throw new RuntimeException("Couldn't create XmlPullParserFactory instance", e);
     }
@@ -285,6 +302,27 @@ public class DashManifestParser extends DefaultHandler
         parseAdaptationSetChild(xpp);
       }
     } while (!XmlPullParserUtil.isEndTag(xpp, "AdaptationSet"));
+
+    for (int i = 0; i < representationInfos.size(); i++) {
+      if (representationInfos.get(i).format.width != Format.NO_VALUE) {
+        representationInfoQueue.add(representationInfos.get(i));
+      }
+    }
+
+    int size = representationInfoQueue.size();
+    RepresentationInfo ideal = null;
+    for (int i = 0; i < size; i++) {
+      RepresentationInfo info = representationInfoQueue.remove();
+      if (info.format.width < 640)
+        ideal = info;
+      else
+        break;
+      Log.d(TAG1, " " + info.format.width);
+    }
+    if (ideal != null) {
+      representationInfos.clear();
+      representationInfos.add(ideal);
+    }
 
     if (Util.maxBitrareOnly || Util.minBitrareOnly) {
       int maxBitrate = Integer.MIN_VALUE;

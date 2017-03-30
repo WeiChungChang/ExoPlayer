@@ -23,6 +23,11 @@
         "extension": "mpd"
       },
       {
+        "name": "Test",
+        "uri": "https://manifest.googlevideo.com/api/manifest/dash/key/yt6/sparams/as%2Chfr%2Cid%2Cinitcwndbps%2Cip%2Cipbits%2Citag%2Cmm%2Cmn%2Cms%2Cmv%2Cpl%2Cplayback_host%2Crequiressl%2Csource%2Cexpire/ipbits/0/as/fmp4_audio_clear%2Cfmp4_sd_hd_clear/playback_host/r8---sn-ipoxu-un5d.googlevideo.com/mt/1490859027/pl/20/itag/0/hfr/1/mn/sn-ipoxu-un5d/mm/31/ip/61.231.184.182/ms/au/initcwndbps/3262500/mv/m/source/youtube/upn/4mf9V_LMsBs/expire/1490880724/id/o-AK3gKCyDaDgkMAF1NaLrkdAShEuTFNhAZRzSGwg1TQU1/requiressl/yes/signature/373429E9F8CC1FFBC94BEDA7037FA35DA2E03A84.C22994A3A6CB75E3CB709627B5FDCCFE5FD655C2",
+        "extension": "mpd"
+      },
+      {
         "name": "original test movie",
         "uri": "asset:///compare.mp4"
       },

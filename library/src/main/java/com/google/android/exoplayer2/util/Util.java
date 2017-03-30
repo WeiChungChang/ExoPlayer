@@ -59,7 +59,7 @@ import java.util.regex.Pattern;
  */
 public final class Util {
 
-  public static final boolean minBitrareOnly = true;
+  public static final boolean minBitrareOnly = false;
   public static final boolean maxBitrareOnly = false;
 
   public static final boolean TRICK_PLAY_TEST_HACK = false;

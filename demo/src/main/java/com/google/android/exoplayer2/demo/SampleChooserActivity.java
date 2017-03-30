@@ -422,7 +422,7 @@ public class SampleChooserActivity extends Activity {
 
     public UriSample(String name, UUID drmSchemeUuid, String drmLicenseUrl,
         String[] drmKeyRequestProperties, boolean preferExtensionDecoders, String uri,
-        String extension) {
+        String extension) {		
       super(name, drmSchemeUuid, drmLicenseUrl, drmKeyRequestProperties, preferExtensionDecoders);
       this.uri = uri;
       this.extension = extension;
@@ -430,6 +430,7 @@ public class SampleChooserActivity extends Activity {
 
     @Override
     public Intent buildIntent(Context context) {
+      Log.d(TAG, "UriSample buildIntent() " + uri + " extension = " + extension);
       return super.buildIntent(context)
           .setData(Uri.parse(uri))
           .putExtra(PlayerActivity.EXTENSION_EXTRA, extension)
