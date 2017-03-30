@@ -25,11 +25,14 @@ public class DashURIGetter
 
   private static final String URL_YOUTUBE_GET_VIDEO_INFO = "http://www.youtube.com/get_video_info?&video_id=";
 
-  public static final String KEY_DASH_VIDEO    = "dashmpd";
-  public static final String KEY_HLS_VIDEO     = "hlsvp";
-  public static final String KEY_ADAPTIVE_FMTS = "adaptive_fmts";
+  public static final String KEY_DASH_VIDEO       = "dashmpd";
+  public static final String KEY_HLS_VIDEO        = "hlsvp";
+  public static final String KEY_ADAPTIVE_FMTS    = "adaptive_fmts";
+  public static final String KEY_ADAPTIVE_SPARAMS = "sparams";
+
 
   private TreeMap<String, String> kvpList = new TreeMap<>();
+  private TreeMap<String, String> fmtList = new TreeMap<>();
 
   private String url;
 
@@ -85,10 +88,13 @@ public class DashURIGetter
 
         if(kvpSplits.length == 2)
         {
+          Log.d(TAG, "	kvpStr[0] = " + kvpSplits[0]);
+          Log.d(TAG, "	kvpStr[1] = " + kvpSplits[1]);
           kvpList.put(kvpSplits[0], kvpSplits[1]);
         }
         else if(kvpSplits.length == 1)
         {
+          Log.d(TAG, "	kvpStr[0] = " + kvpSplits[0]);
           kvpList.put(kvpSplits[0], "");
         }
       }
@@ -97,6 +103,43 @@ public class DashURIGetter
         throw ex;
       }
     }
+
+    if (kvpList.get(KEY_DASH_VIDEO) == null || true) {
+      Log.d(TAG, "kvpList.get(KEY_DASH_VIDEO) = null");
+      String fmt = kvpList.get(KEY_ADAPTIVE_FMTS);
+      Log.d(TAG, "fmt = " + fmt);
+      if (fmt != null) {
+	    fmtList.clear();
+        String[] fmtSplits = fmt.split("&");
+        String fmtStr = "";
+
+        for(int i = 0; i < fmtSplits.length; ++i) {
+          fmtStr = fmtSplits[i];
+          fmtStr = URLDecoder.decode(fmtStr, SimpleHttpClient.ENCODING_UTF_8);
+          String[] fmtContentSplits = fmtStr.split("=", 2); 
+          fmtList.put(fmtContentSplits [0], fmtContentSplits[1]);
+          Log.d(TAG, "  kvpStr[0] = " + fmtContentSplits [0]);
+          Log.d(TAG, "  kvpStr[1] = " + fmtContentSplits [1]);
+
+		  
+          Log.d(TAG, "fmtStr = " + fmtStr);
+        }
+
+        String sparams = fmtList.get(KEY_ADAPTIVE_SPARAMS);
+        Log.d(TAG, "sparams = " + sparams);
+        if (sparams != null) {
+          String[] sparamsSplits = sparams.split(",");
+          String sparamsStr = "";
+          Log.d(TAG, "sparamsSplits.length = " + sparamsSplits.length); 
+          for(int i = 0; i < sparamsSplits.length; ++i) {
+            sparamsStr =  sparamsSplits[i];
+            Log.d(TAG, "sparamsStr = " + sparamsStr);
+          }
+        }
+		
+      }
+    }
+	
   }
 
   public static class SimpleHttpClient
